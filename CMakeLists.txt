@@ -10,36 +10,6 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(dynamixel_sdk REQUIRED)  
 
-# add target
-add_library(hand src/hand.cpp)
-add_library(motor src/motor.cpp)
-
-target_include_directories(my_library
-  PUBLIC
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-    "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
-
-# linking to dependencies
-ament_target_dependencies(my_library PUBLIC rclcpp)
-ament_target_dependencies(my_library PUBLIC dynamixel_sdk)
-
-# installing
-install(
-  DIRECTORY include/
-  DESTINATION include/${PROJECT_NAME}
-)
-
-
-install(
-  TARGETS my_library
-  EXPORT export_${PROJECT_NAME}
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
-)
-
-ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
-#ament_export_dependencies(dynamixel_sdk)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -52,5 +22,26 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+include_directories(include)
+
+add_executable(hand src/hand.cpp)
+add_executable(motor src/motor.cpp)
+
+
+ament_target_dependencies(hand rclcpp dynamixel_sdk)
+ament_target_dependencies(motor rclcpp dynamixel_sdk)
+
+install(TARGETS
+  hand
+  motor
+  DESTINATION lib/${PROJECT_NAME})
+
+install(
+  DIRECTORY include/
+  DESTINATION include
+)
+
+ament_export_include_directories(include)
 
 ament_package()

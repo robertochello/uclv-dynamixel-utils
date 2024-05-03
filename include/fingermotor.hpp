@@ -9,7 +9,7 @@
 class FingerMotor : public Motor {
 
     private:
-    
+        uint8_t id_;
     public:
         FingerMotor(uint8_t id);
         ~FingerMotor();
