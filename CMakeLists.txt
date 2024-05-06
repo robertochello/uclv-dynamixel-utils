@@ -25,23 +25,30 @@ endif()
 
 include_directories(include)
 
-add_executable(hand src/hand.cpp)
-add_executable(motor src/motor.cpp)
+add_library(my_library
+  src/hand.cpp
+  src/motor.cpp
+)
 
-
-ament_target_dependencies(hand rclcpp dynamixel_sdk)
-ament_target_dependencies(motor rclcpp dynamixel_sdk)
-
-install(TARGETS
-  hand
-  motor
-  DESTINATION lib/${PROJECT_NAME})
+ament_export_targets(my_library HAS_LIBRARY_TARGET)
+ament_target_dependencies(
+  my_library
+  "dynamixel_sdk"
+)
 
 install(
-  DIRECTORY include/
+  DIRECTORY include
   DESTINATION include
 )
 
-ament_export_include_directories(include)
+install(
+  TARGETS my_library
+  EXPORT my_library
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
+
 
 ament_package()
