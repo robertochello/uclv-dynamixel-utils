@@ -9,10 +9,20 @@
 class WristMotor : public Motor {
 
     private:
-        uint8_t id_;
     public:
+
         WristMotor(uint8_t id) : Motor() {};
         ~WristMotor() = default;
+
+        // WristMotor(const std::string& serial_port, int baudrate, float protocol_version, 
+        //   dynamixel::PortHandler *const& portHandler, dynamixel::PacketHandler *const& packetHandler,
+        //   uint8_t id);
+
+        // WristMotor(const std::string& serial_port, int baudrate, float protocol_version,
+        //   uint8_t id);
+
+        // WristMotor();
+
 };
 
 #endif

@@ -28,6 +28,8 @@ include_directories(include)
 add_library(my_library
   src/hand.cpp
   src/motor.cpp
+  # src/fingermotor.cpp
+  # src/wristmotor.cpp
 )
 
 ament_target_dependencies(my_library

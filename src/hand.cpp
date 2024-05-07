@@ -90,7 +90,7 @@ void Hand::setSerialPortLowLatency(const std::string& serial_port) {
     std::string command = "setserial " + serial_port + " low_latency";
     int result = system(command.c_str());
     std::cout << "Setting low latency for " << WARN_COLOR << serial_port << CRESET 
-              << " result:" << WARN_COLOR << result << CRESET << std::endl;
+              << " result: " << WARN_COLOR << result << CRESET << std::endl;
 }
 
 
@@ -115,14 +115,8 @@ void Hand::initialize() {
 
 
 
-// std::shared_ptr<FingerMotor> Hand::createFingerMotor(uint8_t id) {
-//     if(!portHandler_)
-//     {
-//         throw std::runtime_error("aujdgasdgas");
-//     }
-//     std::shared_ptr<FingerMotor> newFingerMotor = std::make_unique<FingerMotor>(id);
-//     return newFingerMotor;
-// }
+
+
 
 std::shared_ptr<FingerMotor> Hand::createFingerMotor(uint8_t id) {
     if(!portHandler_)
