@@ -11,8 +11,8 @@ class WristMotor : public Motor {
     private:
         uint8_t id_;
     public:
-        WristMotor(uint8_t id);
-        ~WristMotor();
+        WristMotor(uint8_t id) : Motor() {};
+        ~WristMotor() = default;
 };
 
 #endif

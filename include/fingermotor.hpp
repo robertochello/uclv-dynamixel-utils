@@ -11,8 +11,8 @@ class FingerMotor : public Motor {
     private:
         uint8_t id_;
     public:
-        FingerMotor(uint8_t id);
-        ~FingerMotor();
+        FingerMotor(uint8_t id) : Motor() {};
+        ~FingerMotor() = default;
 };
 
 #endif

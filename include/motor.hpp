@@ -3,12 +3,14 @@
 
 #include "dynamixel_sdk/dynamixel_sdk.h"
 
+
 class Motor {
 private:
     uint8_t id_;
     std::string serial_port_;
     int baudrate_;
     float protocol_version_;
+    
     dynamixel::PortHandler *portHandler_; 
     dynamixel::PacketHandler *packetHandler_;
 

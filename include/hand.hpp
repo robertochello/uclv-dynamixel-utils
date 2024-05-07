@@ -6,7 +6,7 @@
 #include <string>
 #include <cstdlib>
 
-#include <dynamixel_sdk/dynamixel_sdk.h>
+#include "dynamixel_sdk/dynamixel_sdk.h"
 
 #include "colors.hpp"
 
@@ -23,7 +23,7 @@ private:
     std::string serial_port_;
     int baudrate_;
     float protocol_version_;
-
+    
     dynamixel::PortHandler *portHandler_;
     dynamixel::PacketHandler *packetHandler_;
 
