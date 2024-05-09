@@ -2,7 +2,7 @@
 #define MOTOR_H
 
 #include "dynamixel_sdk/dynamixel_sdk.h"
-
+#include <string>
 
 class Motor {
 private:
@@ -38,7 +38,12 @@ public:
     dynamixel::PacketHandler* getPacketHandler() const;
 
 
-    void write1OnAddress( uint16_t address, uint8_t data);
+
+    void setPosition(float position);
+
+
+
+    void write1OnAddress(uint16_t address, uint8_t data);
     void write2OnAddress(uint16_t address, uint16_t data);
     uint8_t read1FromAddress(uint16_t address);
     uint16_t read2FromAddress(uint16_t address);

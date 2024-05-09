@@ -27,9 +27,26 @@ private:
     dynamixel::PortHandler *portHandler_;
     dynamixel::PacketHandler *packetHandler_;
 
+    std::vector<std::shared_ptr<FingerMotor>> fingerMotors_;
+    std::vector<std::shared_ptr<WristMotor>> wristMotors_;
+
+
+    std::unique_ptr<dynamixel::GroupSyncWrite> groupSyncWrite_ = nullptr;
+    std::unique_ptr<dynamixel::GroupSyncRead> groupSyncRead_ = nullptr;
+
+
+
+
 
 
 public:
+
+
+
+    enum CommMode{
+        BulkWrite
+    };
+
     /*
         const std::string& serial_port - il costruttore può accedere al nome della porta seriale senza effettuare una copia dell'oggetto
         dynamixel::PortHandler *const& portHandler - puntatore costante all'oggetto dynamixel::PortHandler, in questo modo il costruttore può
@@ -43,7 +60,7 @@ public:
 
     Hand();
 
-    // Destructor????
+    // Destructor???? delete portHandler_ and packetHandler_ ???
     ~Hand() = default;
 
 
@@ -57,45 +74,99 @@ public:
     int getBaudrate();
     float getProtocolVersion();
 
-    // questi servono per il primo tipo di costruttore: creo il costruttore senza gli handler, creo gli handler, setto gli handler
     void setPortHandler(dynamixel::PortHandler *portHandler);
     void setPacketHandler(dynamixel::PacketHandler *packetHandler);
 
-    // sono const perché i metodi non modificano niente  ???????
     dynamixel::PortHandler* getPortHandler() const;
     dynamixel::PacketHandler* getPacketHandler() const;
 
     void setSerialPortLowLatency(const std::string& serial_port);
 
-    // std::shared_ptr<FingerMotor> createFingerMotor(uint8_t id);
-    std::shared_ptr<FingerMotor> createFingerMotor(uint8_t id);
-    std::shared_ptr<WristMotor> createWristMotor(uint8_t id);
+    std::unique_ptr<FingerMotor> createFingerMotor(uint8_t id);
+    std::unique_ptr<WristMotor> createWristMotor(uint8_t id);
 
-    
-    void addFingerMotor(std::vector<std::shared_ptr<FingerMotor>>& fingerMotors, std::shared_ptr<FingerMotor> fingerMotor);
-    void addWristMotor(std::vector<std::shared_ptr<WristMotor>>& wristMotors, std::shared_ptr<WristMotor> wristMotor);
 
-    void removeFingerMotor(std::vector<FingerMotor>& fingerMotors, uint8_t id);
-    void removeWristMotor(std::vector<WristMotor>& wristMotors, uint8_t id);
+    void addFingerMotor(uint8_t id);    
+    void addWristMotor(uint8_t id);
 
-    std::shared_ptr<dynamixel::GroupSyncWrite> createWrite(uint16_t start_address, uint16_t data_length);
-    std::shared_ptr<dynamixel::GroupBulkWrite> createWrite();
-    std::shared_ptr<dynamixel::GroupSyncRead> createRead(uint16_t start_address, uint16_t data_length);
-    std::shared_ptr<dynamixel::GroupBulkRead> createRead();
+    void addMotor(std::shared_ptr<FingerMotor>& fingerMotor);
+    void addMotor(std::shared_ptr<WristMotor>& wristMotor);
+
+    void printFingerMotors() const;
+    void printWristMotors() const;
+
+    void printMotors() const;
+
+    void removeFingerMotor(uint8_t id);
+    void removeWristMotor(uint8_t id);
+
+    void setComMode( const  Hand::CommMode& mode )
+    {
+        switch (mode)
+        {
+        case /* constant-expression */:
+            /* code */
+            break;
+        
+        default:
+            break;
+        }
+    }
+
+    std::unique_ptr<dynamixel::GroupSyncWrite> createWrite(uint16_t start_address, uint16_t data_length);
+    std::unique_ptr<dynamixel::GroupBulkWrite> createWrite();
+    std::unique_ptr<dynamixel::GroupSyncRead> createRead(uint16_t start_address, uint16_t data_length);
+    std::unique_ptr<dynamixel::GroupBulkRead> createRead();
+
+
+    void moveMotor(uint8_t id, float position /*angolo in rad*/ )
+    {
+
+        position -----> data;
+
+    }
+
+    void moveMotors(const std::vector<uint16_t>& ids, const std::vector<double>& position)
+    {
+
+    }
+
+    void moveMotors(const std::vector<double>& position)
+    {
+        if(!bulk_)
+        {
+            bulk_ = std::make_unique .....
+        }
+        bulk....
+
+        bulk.write();...
+
+    }
+
+    void moveAsyncMotor(uint8_t id, double position)
+    {
+
+        bulk.(....)
+    }
+
+    void asyncMove()
+    {
+        bulk.write();
+    }
 
     void addParamWrite(dynamixel::GroupBulkWrite *groupBulkWrite, uint8_t id, uint16_t start_address, uint16_t data_length, uint8_t data);
     void addParamWrite(dynamixel::GroupSyncWrite *groupSyncWrite, uint8_t id, uint8_t data);
     void addParamRead(dynamixel::GroupBulkRead *groupBulkRead, uint8_t id, uint16_t start_address, uint16_t data_length);
     void addParamRead(dynamixel::GroupSyncRead *groupSyncRead, uint8_t id);
 
-    void writeSingleSync(std::shared_ptr<dynamixel::GroupSyncWrite>& groupSyncWritePtr, Motor& motor, uint8_t data);
-    void writeAllSync(std::shared_ptr<dynamixel::GroupSyncWrite>& groupSyncWritePtr, std::vector<Motor>& motors, uint8_t data);
+    void writeSingleSync(std::unique_ptr<dynamixel::GroupSyncWrite>& groupSyncWritePtr, Motor& motor, uint8_t data);
+    void writeAllSync(std::unique_ptr<dynamixel::GroupSyncWrite>& groupSyncWritePtr, std::vector<Motor>& motors, uint8_t data);
 
-    void readSingleSync(std::shared_ptr<dynamixel::GroupSyncRead>& groupSyncReadPtr, Motor& motor);
-    void readAllSync(std::shared_ptr<dynamixel::GroupSyncRead>& groupSyncReadPtr, std::vector<Motor>& motors);
+    void readSingleSync(std::unique_ptr<dynamixel::GroupSyncRead>& groupSyncReadPtr, Motor& motor);
+    void readAllSync(std::unique_ptr<dynamixel::GroupSyncRead>& groupSyncReadPtr, std::vector<Motor>& motors);
 
-    void writeSingleBulk(std::shared_ptr<dynamixel::GroupBulkWrite>& groupBulkWritePtr, Motor& motor, uint16_t start_address, uint16_t data_length, uint8_t data);
-    void readSingleBulk(std::shared_ptr<dynamixel::GroupBulkRead>& groupBulkReadPtr, Motor& motor, uint16_t start_address, uint16_t data_length);
+    void writeSingleBulk(std::unique_ptr<dynamixel::GroupBulkWrite>& groupBulkWritePtr, Motor& motor, uint16_t start_address, uint16_t data_length, uint8_t data);
+    void readSingleBulk(std::unique_ptr<dynamixel::GroupBulkRead>& groupBulkReadPtr, Motor& motor, uint16_t start_address, uint16_t data_length);
 
 };
 

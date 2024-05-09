@@ -2,15 +2,15 @@
 
 #include <memory>
 
-#include "fingermotor.hpp"
+#include "my_library/fingermotor.hpp"
 
 
-// FingerMotor::FingerMotor(const std::string& serial_port, int baudrate, float protocol_version, 
-//             dynamixel::PortHandler *const& portHandler, dynamixel::PacketHandler *const& packetHandler,
-//             uint8_t id) 
-//             : Motor(serial_port, baudrate, protocol_version, portHandler, packetHandler, id) {}
+FingerMotor::FingerMotor(const std::string& serial_port, int baudrate, float protocol_version, 
+            dynamixel::PortHandler *const& portHandler, dynamixel::PacketHandler *const& packetHandler,
+            uint8_t id) 
+            : Motor(serial_port, baudrate, protocol_version, portHandler, packetHandler, id) {}
 
-// FingerMotor::FingerMotor(const std::string& serial_port, int baudrate, float protocol_version, uint8_t id)
-//             : Motor(serial_port, baudrate, protocol_version, id) {}
+FingerMotor::FingerMotor(const std::string& serial_port, int baudrate, float protocol_version, uint8_t id)
+            : Motor(serial_port, baudrate, protocol_version, id) {}
 
-// FingerMotor::FingerMotor() : Motor() {};
+FingerMotor::FingerMotor() : Motor() {};

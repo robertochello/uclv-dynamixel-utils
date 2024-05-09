@@ -6,9 +6,7 @@
 
 
 
-/*==============================================================================
-                                  Constructors
-==============================================================================*/
+
 Hand::Hand(const std::string& serial_port, int baudrate, float protocol_version, 
             dynamixel::PortHandler *const& portHandler, dynamixel::PacketHandler *const& packetHandler)
     : 
@@ -41,9 +39,7 @@ Hand::Hand()
 
 
 
-/*==============================================================================
-                                  Set - Get
-==============================================================================*/
+
 
 void Hand::setSerialPort(const std::string& serial_port) {
     serial_port_ = serial_port;
@@ -85,6 +81,10 @@ dynamixel::PacketHandler* Hand::getPacketHandler() const {
     return packetHandler_;
 }
 
+
+
+
+
 void Hand::setSerialPortLowLatency(const std::string& serial_port) {
     std::cout << "Setting low latency for " << WARN_COLOR << serial_port << CRESET << std::endl;
     std::string command = "setserial " + serial_port + " low_latency";
@@ -92,6 +92,9 @@ void Hand::setSerialPortLowLatency(const std::string& serial_port) {
     std::cout << "Setting low latency for " << WARN_COLOR << serial_port << CRESET 
               << " result: " << WARN_COLOR << result << CRESET << std::endl;
 }
+
+
+
 
 
 
@@ -118,53 +121,93 @@ void Hand::initialize() {
 
 
 
-std::shared_ptr<FingerMotor> Hand::createFingerMotor(uint8_t id) {
-    if(!portHandler_)
-    {
-        throw std::runtime_error("aujdgasdgas");
-    }
-    std::shared_ptr<FingerMotor> newFingerMotor = std::make_shared<FingerMotor>(id);
-    return newFingerMotor;
-}
 
-std::shared_ptr<WristMotor> Hand::createWristMotor(uint8_t id) {
-    std::shared_ptr<WristMotor> newWristMotor = std::make_unique<WristMotor>(id);
-    return newWristMotor;
+
+
+
+std::unique_ptr<FingerMotor> Hand::createFingerMotor(uint8_t id) {
+    return std::make_unique<FingerMotor>(serial_port_, baudrate_, protocol_version_, portHandler_, packetHandler_, id);
+    addFingerMotor(id);
 }
 
 
-
-void Hand::addFingerMotor(std::vector<std::shared_ptr<FingerMotor>>& fingerMotors, std::shared_ptr<FingerMotor> fingerMotor) {
-    fingerMotors.push_back(fingerMotor);
-}
-
-
-void Hand::addWristMotor(std::vector<std::shared_ptr<WristMotor>>& wristMotors, std::shared_ptr<WristMotor> wristMotor) {
-    wristMotors.push_back(std::move(wristMotor));
+std::unique_ptr<WristMotor> Hand::createWristMotor(uint8_t id) {
+    return std::make_unique<WristMotor>(serial_port_, baudrate_, protocol_version_, portHandler_, packetHandler_, id);
+    addWristMotor(id);
 }
 
 
 
-void Hand::removeFingerMotor(std::vector<FingerMotor>& fingerMotors, uint8_t id) {
-    for (auto it = fingerMotors.begin(); it != fingerMotors.end(); ++it) {
-        if (it->getId() == id) {
-            fingerMotors.erase(it);
-            std::cout << "FingerMotor [ID:" << id << "] removed successfully." << std::endl;
+void Hand::addFingerMotor(uint8_t id) {
+    for (const auto& motor : fingerMotors_) {
+        if (motor->getId() == id) {
+            // std::cout << "FingerMotor with ID " << id << " already exists in the list." << std::endl;
             return;
         }
     }
-    std::cerr << "FingerMotor [ID:" << id << "] not found." << std::endl;
+    fingerMotors_.push_back(std::make_unique<FingerMotor>(serial_port_, baudrate_, protocol_version_, portHandler_, packetHandler_, id));
 }
 
-void Hand::removeWristMotor(std::vector<WristMotor>& wristMotors, uint8_t id) {
-    for (auto it = wristMotors.begin(); it != wristMotors.end(); ++it) {
-        if (it->getId() == id) {
-            wristMotors.erase(it);
-            std::cout << "WristMotor [ID:" << id << "] removed successfully." << std::endl;
+
+void Hand::addWristMotor(uint8_t id) {
+    for (const auto& motor : wristMotors_) {
+        if (motor->getId() == id) {
+            // std::cout << "WristMotor with ID " << id << " already exists in the list." << std::endl;
             return;
         }
     }
-    std::cerr << "WristMotor [ID:" << id << "] not found." << std::endl;
+    wristMotors_.push_back(std::make_unique<WristMotor>(serial_port_, baudrate_, protocol_version_, portHandler_, packetHandler_, id));
+}
+
+
+
+
+void Hand::addMotor(std::shared_ptr<WristMotor>& wristMotor) {
+    // check se il motor con quell'id è già presente nella lista
+    wristMotors_.push_back(wristMotor);
+
+}
+
+
+void Hand::addMotor(std::shared_ptr<FingerMotor>& fingerMotor) {
+    // check se il motor con quell'id è già presente nella lista
+    fingerMotors_.push_back(fingerMotor);
+
+}
+
+
+
+
+void Hand::printFingerMotors() const {
+    if (fingerMotors_.empty()) {
+        std::cout << "No Finger Motors found." << std::endl;
+        return;
+    }
+    std::cout << "Finger Motors:" << std::endl;
+    for (const auto& motor : fingerMotors_) {
+        std::cout << "ID: " << motor->getId() << std::endl;
+    }
+}
+
+
+void Hand::printWristMotors() const {
+    if (wristMotors_.empty()) {
+        std::cout << "No Wrist Motors found." << std::endl;
+        return;
+    }
+    std::cout << "Wrist Motors:" << std::endl;
+    for (const auto& motor : wristMotors_) {
+        std::cout << "ID: " << motor->getId() << std::endl;
+    }
+}
+
+
+void Hand::removeFingerMotor(uint8_t id) {
+    // elimina dalla lista il motore
+}
+
+void Hand::removeWristMotor(uint8_t id) {
+    // elimina dalla lista il motore
 }
 
 
@@ -172,22 +215,31 @@ void Hand::removeWristMotor(std::vector<WristMotor>& wristMotors, uint8_t id) {
 
 
 
-std::shared_ptr<dynamixel::GroupSyncWrite> Hand::createWrite(uint16_t start_address, uint16_t data_length) {
+
+
+
+
+
+
+
+
+
+std::unique_ptr<dynamixel::GroupSyncWrite> Hand::createWrite(uint16_t start_address, uint16_t data_length) {
     return std::make_unique<dynamixel::GroupSyncWrite>(portHandler_, packetHandler_, start_address, data_length);
 }
 
 
-std::shared_ptr<dynamixel::GroupBulkWrite> Hand::createWrite() {
+std::unique_ptr<dynamixel::GroupBulkWrite> Hand::createWrite() {
     return std::make_unique<dynamixel::GroupBulkWrite>(portHandler_, packetHandler_);
 }
 
 
-std::shared_ptr<dynamixel::GroupSyncRead> Hand::createRead(uint16_t start_address, uint16_t data_length) {
+std::unique_ptr<dynamixel::GroupSyncRead> Hand::createRead(uint16_t start_address, uint16_t data_length) {
     return std::make_unique<dynamixel::GroupSyncRead>(portHandler_, packetHandler_, start_address, data_length);
 }
 
 
-std::shared_ptr<dynamixel::GroupBulkRead> Hand::createRead() {
+std::unique_ptr<dynamixel::GroupBulkRead> Hand::createRead() {
     return std::make_unique<dynamixel::GroupBulkRead>(portHandler_, packetHandler_);
 }
 
@@ -196,7 +248,7 @@ std::shared_ptr<dynamixel::GroupBulkRead> Hand::createRead() {
 
 
 
-void Hand::writeSingleSync(std::shared_ptr<dynamixel::GroupSyncWrite>& groupSyncWritePtr, Motor& motor, uint8_t data) {
+void Hand::writeSingleSync(std::unique_ptr<dynamixel::GroupSyncWrite>& groupSyncWritePtr, Motor& motor, uint8_t data) {
     if (!groupSyncWritePtr) {
         // groupSyncWritePtr has not been initialized yet
         return;
@@ -206,7 +258,7 @@ void Hand::writeSingleSync(std::shared_ptr<dynamixel::GroupSyncWrite>& groupSync
     groupSyncWritePtr->txPacket();
 }
 
-void Hand::writeAllSync(std::shared_ptr<dynamixel::GroupSyncWrite>& groupSyncWritePtr, std::vector<Motor>& motors, uint8_t data) {
+void Hand::writeAllSync(std::unique_ptr<dynamixel::GroupSyncWrite>& groupSyncWritePtr, std::vector<Motor>& motors, uint8_t data) {
     if (!groupSyncWritePtr) {
         // groupSyncWritePtr has not been initialized yet
         return;
@@ -217,7 +269,7 @@ void Hand::writeAllSync(std::shared_ptr<dynamixel::GroupSyncWrite>& groupSyncWri
     groupSyncWritePtr->clearParam();
 }
 
-void Hand::readSingleSync(std::shared_ptr<dynamixel::GroupSyncRead>& groupSyncReadPtr, Motor& motor) {
+void Hand::readSingleSync(std::unique_ptr<dynamixel::GroupSyncRead>& groupSyncReadPtr, Motor& motor) {
     if (!groupSyncReadPtr) {
         // groupSyncReadPtr has not been initialized yet
         return;
@@ -227,7 +279,7 @@ void Hand::readSingleSync(std::shared_ptr<dynamixel::GroupSyncRead>& groupSyncRe
     // After writing parameters to the motor, txRxPacket, isAvailable, and getData
 }
 
-void Hand::readAllSync(std::shared_ptr<dynamixel::GroupSyncRead>& groupSyncReadPtr, std::vector<Motor>& motors) {
+void Hand::readAllSync(std::unique_ptr<dynamixel::GroupSyncRead>& groupSyncReadPtr, std::vector<Motor>& motors) {
     if (!groupSyncReadPtr) {
         // groupSyncReadPtr has not been initialized yet 
         return;
@@ -237,7 +289,7 @@ void Hand::readAllSync(std::shared_ptr<dynamixel::GroupSyncRead>& groupSyncReadP
     }
 }
 
-void Hand::writeSingleBulk(std::shared_ptr<dynamixel::GroupBulkWrite>& groupBulkWritePtr, Motor& motor, uint16_t start_address, uint16_t data_length, uint8_t data) {
+void Hand::writeSingleBulk(std::unique_ptr<dynamixel::GroupBulkWrite>& groupBulkWritePtr, Motor& motor, uint16_t start_address, uint16_t data_length, uint8_t data) {
     if (!groupBulkWritePtr) {
         // groupBulkWritePtr has not been initialized yet
         return;
@@ -249,7 +301,7 @@ void Hand::writeSingleBulk(std::shared_ptr<dynamixel::GroupBulkWrite>& groupBulk
     // groupBulkWritePtr->clearParam();
 }
 
-void Hand::readSingleBulk(std::shared_ptr<dynamixel::GroupBulkRead>& groupBulkReadPtr, Motor& motor, uint16_t start_address, uint16_t data_length) {
+void Hand::readSingleBulk(std::unique_ptr<dynamixel::GroupBulkRead>& groupBulkReadPtr, Motor& motor, uint16_t start_address, uint16_t data_length) {
     if (!groupBulkReadPtr) {
         // groupBulkReadPtr has not been initialized yet
         return;

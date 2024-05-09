@@ -79,6 +79,23 @@ dynamixel::PacketHandler* Motor::getPacketHandler() const {
 
 
 
+// setto posizione del motore
+// gli passo la posizione in rad
+// conversione rad -> position
+// uso write2OnAddress
+void Motor::setPosition(float rad) {
+    // conversione rad -> position
+    write2OnAddress(30,position);
+}
+
+// leggo posizione
+// uso read2FromAddress
+// conversione position -> rad
+uint8_t Motor::readPresentPosition() {
+    read2FromAddress(30);
+    // conversione position -> rad
+}
+
 
 
 
