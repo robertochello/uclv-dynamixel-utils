@@ -13,4 +13,4 @@
 // WristMotor::WristMotor(const std::string& serial_port, int baudrate, float protocol_version, uint8_t id)
 //             : Motor(serial_port, baudrate, protocol_version, id) {}
 
-WristMotor::WristMotor() : Motor() {};
+// WristMotor::WristMotor() : Motor() {};
