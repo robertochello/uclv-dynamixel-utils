@@ -39,7 +39,8 @@ public:
 
 
 
-    void setPosition(float position);
+    void setTargetPosition(float position);
+    uint8_t readPresentPosition();
 
 
 

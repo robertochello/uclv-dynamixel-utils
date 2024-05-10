@@ -175,8 +175,13 @@ void Hand::addMotor(std::shared_ptr<FingerMotor>& fingerMotor) {
 
 }
 
-
-
+// print tutti i motori
+// printFingerMotors
+// printWristMotors
+void Hand::printMotors() const {
+    printFingerMotors();
+    printWristMotors();
+}
 
 void Hand::printFingerMotors() const {
     if (fingerMotors_.empty()) {
@@ -213,35 +218,266 @@ void Hand::removeWristMotor(uint8_t id) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-std::unique_ptr<dynamixel::GroupSyncWrite> Hand::createWrite(uint16_t start_address, uint16_t data_length) {
-    return std::make_unique<dynamixel::GroupSyncWrite>(portHandler_, packetHandler_, start_address, data_length);
+// muove un motore
+// id del motore
+// posizione
+// chiama setTargetPosition -> chiama write2OnAddress (dentro ha write2ByteTxRx con parametro id)
+void Hand::moveMotor(uint8_t id, float position) {
+    motor.setTargetPosition(position);
 }
 
 
-std::unique_ptr<dynamixel::GroupBulkWrite> Hand::createWrite() {
-    return std::make_unique<dynamixel::GroupBulkWrite>(portHandler_, packetHandler_);
+// muove più motori
+// vettore ids
+// vettore posizioni
+// check ids e positions devono avere la stessa dimensione
+// per ogni elemento di ids e positions che si trovano nella stessa posizione, chiama moveMotor
+void Hand::moveMotors(const std::vector<uint16_t>& ids, const std::vector<double>& positions) {
+    if (ids.size() != positions.size())
+    {
+       // ERRORE DEVONO AVERE LA STESSA DIMENSIONE
+    } 
+    for (size_t i = 0; i < ids.size(); i++)
+    {
+        for (size_t j = 0; j < positions.size(); j++)
+        {
+            if (i == j) {
+                moveMotor(ids[i], positions[j]);
+            }
+        }    
+    }  
+}
+
+// muove più motori con bulk
+// vettore ids
+// vettore posizioni
+// check esistenza bulk
+// addParam bulkRead ha bisogno dell'id, address, length
+// costruzione parametro addParam bulkWrite (posizione)
+// addParam bulkWrite ha bisogno dell'id, address, length, parametro(posizione)
+// txPacket
+void Hand::moveMotorsBulk(const std::vector<uint16_t>& ids, const std::vector<double>& positions) {
+    uint8_t param_target_position[2];
+    if (!groupBulkRead_ && !groupBulkWrite_) // qui serve solo il check per la write
+    {
+        groupBulkRead_ = std::make_unique<dynamixel::GroupBulkRead>(portHandler_, packetHandler_);
+        groupBulkWrite_ = std::make_unique<dynamixel::GroupBulkWrite>(portHandler_, packetHandler_);
+    }
+    for (size_t i = 0; i < positions.size(); i++)
+    {
+        param_target_position[0] = DXL_LOBYTE(DXL_LOWORD(positions[i]));
+        param_target_position[1] = DXL_LOBYTE(DXL_LOWORD(positions[i]));
+        groupBulkWrite_->addParam(ids[i], 30, 2, param_target_position);
+    }
+    groupBulkWrite_->txPacket();
+    /*
+        for (size_t i = 0; i < ids.size(); i++)
+        {
+            for (size_t j = 0; j < positions.size(); j++)
+            {
+                if (i == j) {
+                    bulk(ids[i], positions[j]); //in questo modo fa txPacket per ogni motore
+                }
+            }
+        }
+    */
 }
 
 
-std::unique_ptr<dynamixel::GroupSyncRead> Hand::createRead(uint16_t start_address, uint16_t data_length) {
-    return std::make_unique<dynamixel::GroupSyncRead>(portHandler_, packetHandler_, start_address, data_length);
+// muove un motore con bulk
+// id
+// posizioni
+// check esistenza bulk, se non c'è lo istanzia
+// addParam bulkRead ha bisogno dell'id, address, length
+// costruzione parametro addParam bulkWrite (posizione)
+// addParam bulkWrite ha bisogno dell'id, address, length, parametro(posizione)
+// txPacket
+void Hand::moveMotorBulk(uint8_t id, float position) {
+    uint8_t param_target_position[2];
+    if (!groupBulkRead_ && !groupBulkWrite_) // qui serve solo il check per la write
+    {
+        groupBulkRead_ = std::make_unique<dynamixel::GroupBulkRead>(portHandler_, packetHandler_);
+        groupBulkWrite_ = std::make_unique<dynamixel::GroupBulkWrite>(portHandler_, packetHandler_);
+    }
+    param_target_position[0] = DXL_LOBYTE(DXL_LOWORD(position));
+    param_target_position[1] = DXL_LOBYTE(DXL_LOWORD(position));
+    groupBulkWrite_->addParam(id, 30, 2, param_target_position);
+    groupBulkWrite_->txPacket();
 }
 
 
-std::unique_ptr<dynamixel::GroupBulkRead> Hand::createRead() {
-    return std::make_unique<dynamixel::GroupBulkRead>(portHandler_, packetHandler_);
+
+
+void Hand::checkBulk() {
+    if (!groupBulkRead_ && !groupBulkWrite_)
+    {
+        groupBulkRead_ = std::make_unique<dynamixel::GroupBulkRead>(portHandler_, packetHandler_);
+        groupBulkWrite_ = std::make_unique<dynamixel::GroupBulkWrite>(portHandler_, packetHandler_);
+    }
 }
+
+
+
+
+
+
+
+
+
+
+// legge posizione motore
+// id
+// readPresentPosition() -> read2FromAddress() (dentro ha read2ByteTxRx con parametro id)
+void Hand::readMotor(uint8_t id) {
+    auto position = Motor::readPresentPosition();
+    std::cout << "ID: [" << id << "] - Present position: " << position << std::endl;
+}
+
+// legge posizioni motori
+// vettore ids
+// readMotor(id) per ogni elemento del vettore
+void Hand::readMotors(const std::vector<uint16_t>& ids) {
+    for (size_t i = 0; i < ids.size(); i++)
+    {
+        readMotor(ids[i]);
+    }
+}
+
+
+// versione "normale"
+// id
+// check bulkRead
+// addParam
+// txRxPacket
+// isAvailable
+// getData
+void Hand::readMotorBulk(uint8_t id) {
+        if (!groupBulkRead_) {
+            groupBulkRead_ = std::make_unique<dynamixel::GroupBulkRead>(portHandler_, packetHandler_);
+        }
+        groupBulkRead_->addParam(id, 30, 2);
+        groupBulkRead_->txRxPacket();
+        groupBulkRead_->isAvailable(id, 30, 2);
+        auto position = groupBulkRead_->getData(id, 30, 2);
+        std::cout << "ID: [" << id << "] - Present position: " << position << std::endl;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// trasformazione dato da scrivere
+// addParam su bulkWrite
+void Hand::addParamWrite(uint8_t id, uint16_t start_address, uint16_t data_length, uint8_t data) {
+    bool dxl_addparam_result = false;
+    uint8_t param_target_position[2];
+    param_target_position[0] = DXL_LOBYTE(DXL_LOWORD(data));
+    param_target_position[1] = DXL_HIBYTE(DXL_LOWORD(data));
+    dxl_addparam_result = groupBulkWrite_->addParam(id, start_address, data_length, param_target_position);
+    if (!dxl_addparam_result) {
+        std::cerr << "Failed to add param write for address: " << start_address << " for [ID:" << id << "]" << std::endl;
+    }    
+}
+
+// inutile
+void Hand::writeSingleBulk(uint8_t id, uint16_t start_address, uint16_t data_length, uint8_t data) {
+    addParamWrite(id, start_address, data_length, data);
+}
+
+
+void Hand::moveMotorBulk(uint8_t id, float position) {
+    if (!groupBulkWrite_) {
+        groupBulkWrite_ = std::make_unique<dynamixel::GroupBulkWrite>(portHandler_, packetHandler_);
+    }
+    addParamWrite(id, 30, 2, position);
+    //writeSingleBulk(id, 30, 2, position);
+    groupBulkWrite_->txPacket();
+}
+
+
+
+
+void Hand::moveMotorsBulk(const std::vector<uint16_t>& ids, const std::vector<double>& positions) {
+    for (size_t i = 0; i < ids.size(); i++)
+        {
+            for (size_t j = 0; j < positions.size(); j++)
+            {
+                if (i == j) {
+                    moveMotor(ids[i], positions[j]); //in questo modo fa txPacket per ogni motore
+                }
+            }
+        }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -346,3 +582,10 @@ void Hand::addParamWrite(dynamixel::GroupSyncWrite *groupSyncWrite, uint8_t id, 
         std::cerr << "Failed to add param for [ID:" << id << "]" << std::endl;
     }    
 }
+
+
+
+
+
+
+

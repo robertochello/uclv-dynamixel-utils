@@ -83,17 +83,20 @@ dynamixel::PacketHandler* Motor::getPacketHandler() const {
 // gli passo la posizione in rad
 // conversione rad -> position
 // uso write2OnAddress
-void Motor::setPosition(float rad) {
-    // conversione rad -> position
-    write2OnAddress(30,position);
+void Motor::setTargetPosition(float rad) { // forse la conversione la deve fare nel metodo MUOVI DITO
+    angle = rad * 180 / PI
+    position = angle / 0.088
+    write2OnAddress(30, position);
 }
 
 // leggo posizione
 // uso read2FromAddress
 // conversione position -> rad
 uint8_t Motor::readPresentPosition() {
-    read2FromAddress(30);
-    // conversione position -> rad
+    uint16_t position = read2FromAddress(30);
+    angle = position * 0.088
+    rad = angle * PI / 180
+    return rad;
 }
 
 
