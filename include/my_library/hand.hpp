@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <cstdlib>
+#include <cmath>
 
 #include "dynamixel_sdk/dynamixel_sdk.h"
 
@@ -27,10 +28,12 @@ private:
     dynamixel::PortHandler *portHandler_;
     dynamixel::PacketHandler *packetHandler_;
 
+
+    // più shared pointer possono puntare allo stesso oggetto e l'oggetto verrà eliminato quando l'ultimo shared pointer esce dallo scope
     std::vector<std::shared_ptr<FingerMotor>> fingerMotors_;
     std::vector<std::shared_ptr<WristMotor>> wristMotors_;
 
-
+    // può esserci solo uno unique_ptr che punta a quell'oggetto 
     std::unique_ptr<dynamixel::GroupSyncWrite> groupSyncWrite_ = nullptr;
     std::unique_ptr<dynamixel::GroupSyncRead> groupSyncRead_ = nullptr;
 
@@ -39,16 +42,7 @@ private:
 
 
 
-
-
-
 public:
-
-
-
-    enum CommMode{
-        BulkWrite
-    };
 
     /*
         const std::string& serial_port - il costruttore può accedere al nome della porta seriale senza effettuare una copia dell'oggetto
@@ -63,14 +57,16 @@ public:
 
     Hand();
 
-    // Destructor???? delete portHandler_ and packetHandler_ ???
-    ~Hand() = default;
+    // distrutto portHandler e packetHandler
+    ~Hand();
 
 
 
     void initialize();
 
     void setSerialPort(const std::string& serial_port);
+    
+    // NON DOVREBBE SERVIRE
     void setBaudrate(int baudrate);
     void setProtocolVersion(float protocol_version);
     std::string getSerialPort();
@@ -80,13 +76,22 @@ public:
     void setPortHandler(dynamixel::PortHandler *portHandler);
     void setPacketHandler(dynamixel::PacketHandler *packetHandler);
 
-    dynamixel::PortHandler* getPortHandler() const;
-    dynamixel::PacketHandler* getPacketHandler() const;
 
+    // ESISTONO GIA IN DYNAMIXEL
+    // dynamixel::PortHandler* getPortHandler() const;
+    // dynamixel::PacketHandler* getPacketHandler() const;
+
+
+    // for stable communication with high Baudrate, USB latency values must be setted to the lower
     void setSerialPortLowLatency(const std::string& serial_port);
 
-    std::unique_ptr<FingerMotor> createFingerMotor(uint8_t id);
-    std::unique_ptr<WristMotor> createWristMotor(uint8_t id);
+
+    float rad_to_angle(float radians);
+    float angle_to_position(float angle);
+
+    // shared pointer per la creazione del motore? forse no perc
+    std::shared_ptr<FingerMotor> createFingerMotor(uint8_t id);
+    std::shared_ptr<WristMotor> createWristMotor(uint8_t id);
 
 
     void addFingerMotor(uint8_t id);    
@@ -94,7 +99,7 @@ public:
 
     void addMotor(std::shared_ptr<FingerMotor>& fingerMotor);
     void addMotor(std::shared_ptr<WristMotor>& wristMotor);
-
+ 
     void printFingerMotors() const;
     void printWristMotors() const;
 
@@ -105,182 +110,37 @@ public:
 
 
 
-
-
-
-
-
-
-    // void setComMode( const  Hand::CommMode& mode )
-    // {
-    //     switch (mode)
-    //     {
-    //     case /* constant-expression */:
-    //         /* code */
-    //         break;
-        
-    //     default:
-    //         break;
-    //     }
-    // }
-
-
-
-
-
-
-
-
-    // void moveAsyncMotor(uint8_t id, double position)
-    // {
-
-    //     bulk.(....)
-    // }
-
-    // void asyncMove()
-    // {
-    //     bulk.write();
-    // }
-
-
-
-
-
-
-
     // muove un motore
-    void Hand::moveMotor(uint8_t id, float position);
+    void Hand::moveMotor(const std::shared_ptr<Motor>& motor, const uint8_t& id, const float& position);
     // muove più motori
-    void Hand::moveMotors(const std::vector<uint16_t>& ids, const std::vector<double>& positions);
+    void Hand::moveMotors(const std::vector<std::shared_ptr<Motor>>& motors, const std::vector<uint16_t>& ids, const std::vector<double>& positions);
     // leggi posizione motore
-    void Hand::readMotor(uint8_t id);
+    void Hand::readPositionMotor(const std::shared_ptr<Motor>& motor, const uint8_t& id);
     // leggi posizione motori
-    void Hand::readMotors(const std::vector<uint16_t>& ids);
-
+    void Hand::readPositionsMotors(const std::vector<std::shared_ptr<Motor>>& motors, const std::vector<uint16_t>& ids);
 
 
     // muove un motore con bulk
-    void Hand::moveMotorBulk(uint8_t id, float position);
+    void Hand::moveMotorBulk(const uint8_t& id, const float& position);
     // muove più motori con bulk
     void Hand::moveMotorsBulk(const std::vector<uint16_t>& ids, const std::vector<double>& positions);
-    // leggi posizione motori con bulk
-    void Hand::readMotorBulk(uint8_t id);
-    // check esistenza bulkRead e bulkWrite
-    void Hand::checkBulk();  // NON CREDO SERVA
+    // leggi posizione motore con bulk
+    void Hand::readMotorBulk(const uint8_t& id);
+    // leggi posizioni motori con bulk
+    void Hand::readMotorsBulk(const std::vector<uint16_t>& ids);
 
-
-
-
-    // muove un motore con bulk usando addParamWrite (writeSingleBulk)
-    void moveMotorBulk(uint8_t id, float position);
-    // muove più motori con moveMotorBulk
-    void moveMotorsBulk(const std::vector<uint16_t>& ids, const std::vector<double>& positions);
-
+    ///////////////////////////////////////////////
+    // muove un motore con bulk usando addParamWrite
+    void moveMotorBulk2(const uint8_t& id, const float& position);
+    // muove più motori con moveMotorBulk2
+    void moveMotorsBulk2(const std::vector<uint16_t>& ids, const std::vector<double>& positions);
+    // serve per moveMotorBulk2 e moveMotorsBulk2
     void addParamWrite(uint8_t id, uint16_t start_address, uint16_t data_length, uint8_t data);
-    void writeSingleBulk(uint8_t id, uint16_t start_address, uint16_t data_length, uint8_t data);
 
 
 
+    
 
-     //bisogna fare le varie read
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-    void addParamWrite(dynamixel::GroupBulkWrite *groupBulkWrite, uint8_t id, uint16_t start_address, uint16_t data_length, uint8_t data);
-    void addParamWrite(dynamixel::GroupSyncWrite *groupSyncWrite, uint8_t id, uint8_t data);
-    void addParamRead(dynamixel::GroupBulkRead *groupBulkRead, uint8_t id, uint16_t start_address, uint16_t data_length);
-    void addParamRead(dynamixel::GroupSyncRead *groupSyncRead, uint8_t id);
-
-    void writeSingleSync(std::unique_ptr<dynamixel::GroupSyncWrite>& groupSyncWritePtr, Motor& motor, uint8_t data);
-    void writeAllSync(std::unique_ptr<dynamixel::GroupSyncWrite>& groupSyncWritePtr, std::vector<Motor>& motors, uint8_t data);
-
-    void readSingleSync(std::unique_ptr<dynamixel::GroupSyncRead>& groupSyncReadPtr, Motor& motor);
-    void readAllSync(std::unique_ptr<dynamixel::GroupSyncRead>& groupSyncReadPtr, std::vector<Motor>& motors);
-
-    void writeSingleBulk(std::unique_ptr<dynamixel::GroupBulkWrite>& groupBulkWritePtr, Motor& motor, uint16_t start_address, uint16_t data_length, uint8_t data);
-    void readSingleBulk(std::unique_ptr<dynamixel::GroupBulkRead>& groupBulkReadPtr, Motor& motor, uint16_t start_address, uint16_t data_length);
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
 };
 
 #endif // HAND_HPP
