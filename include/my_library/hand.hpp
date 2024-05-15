@@ -86,8 +86,11 @@ public:
     void setSerialPortLowLatency(const std::string& serial_port);
 
 
-    float rad_to_angle(float radians);
-    float angle_to_position(float angle);
+    float rad_to_degrees(float radians);
+    float degrees_to_position(float degrees);
+
+    float degrees_to_rad(float degrees);
+    float position_to_degrees(float position);
 
     // shared pointer per la creazione del motore? forse no perc
     std::shared_ptr<FingerMotor> createFingerMotor(uint8_t id);
@@ -110,36 +113,30 @@ public:
 
 
 
-    // muove un motore
-    void Hand::moveMotor(const std::shared_ptr<Motor>& motor, const uint8_t& id, const float& position);
-    // muove più motori
-    void Hand::moveMotors(const std::vector<std::shared_ptr<Motor>>& motors, const std::vector<uint16_t>& ids, const std::vector<double>& positions);
-    // leggi posizione motore
-    void Hand::readPositionMotor(const std::shared_ptr<Motor>& motor, const uint8_t& id);
-    // leggi posizione motori
-    void Hand::readPositionsMotors(const std::vector<std::shared_ptr<Motor>>& motors, const std::vector<uint16_t>& ids);
 
 
-    // muove un motore con bulk
-    void Hand::moveMotorBulk(const uint8_t& id, const float& position);
+
+    // move
+    void Hand::moveFingerMotor(const uint8_t& id, const float& position);
+    void Hand::moveWristMotor(const uint8_t& id, const float& position);
+
+    // read
+    float Hand::readFingerPositionMotor(const uint8_t& id);
+    float Hand::readWristPositionMotor(const uint8_t& id);
+
+
+
+
+
     // muove più motori con bulk
     void Hand::moveMotorsBulk(const std::vector<uint16_t>& ids, const std::vector<double>& positions);
-    // leggi posizione motore con bulk
-    void Hand::readMotorBulk(const uint8_t& id);
     // leggi posizioni motori con bulk
     void Hand::readMotorsBulk(const std::vector<uint16_t>& ids);
 
-    ///////////////////////////////////////////////
-    // muove un motore con bulk usando addParamWrite
-    void moveMotorBulk2(const uint8_t& id, const float& position);
-    // muove più motori con moveMotorBulk2
-    void moveMotorsBulk2(const std::vector<uint16_t>& ids, const std::vector<double>& positions);
-    // serve per moveMotorBulk2 e moveMotorsBulk2
-    void addParamWrite(uint8_t id, uint16_t start_address, uint16_t data_length, uint8_t data);
 
 
 
-    
+
 
 };
 

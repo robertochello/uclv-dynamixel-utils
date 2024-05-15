@@ -76,20 +76,14 @@ dynamixel::PacketHandler* Motor::getPacketHandler() const {
 
 
 
-// setto posizione del motore
-// uso write2OnAddress
-void Motor::setTargetPosition(float position) {
-    write2OnAddress(30, position);
+
+void Motor::setTargetPosition(uint8_t id, float position) {
+    write2OnAddress(id, 30, position);
 }
 
-// leggo posizione
-// uso read2FromAddress
-// conversione position -> rad
-uint8_t Motor::readPresentPosition() {
-    uint16_t position = read2FromAddress(30);
-    angle = position * 0.088
-    rad = angle * PI / 180
-    return rad;
+
+uint16_t Motor::readPresentPosition(uint8_t id) {
+    return read2FromAddress(id, 30);
 }
 
 
@@ -99,50 +93,50 @@ uint8_t Motor::readPresentPosition() {
 
 
 
-void Motor::write1OnAddress(uint16_t address, uint8_t data) {
+void Motor::write1OnAddress(uint8_t id, uint16_t address, uint8_t data) {
     uint8_t dxl_error = 0;
-    int dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, id_, address, data, &dxl_error);
+    int dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, id, address, data, &dxl_error);
     if (dxl_comm_result != COMM_SUCCESS || dxl_error != 0) {
-        std::cerr << "Failed to write input: " << data << " with address: " << address << " for [ID:" << id_ << "]" << std::endl;
+        std::cerr << "Failed to write input: " << data << " with address: " << address << " for [ID:" << id << "]" << std::endl;
     }
     else {
-        std::cout << "Success to write input: " << data << " with address: " << address << " for [ID:" << id_ << "]" << std::endl;
+        std::cout << "Success to write input: " << data << " with address: " << address << " for [ID:" << id << "]" << std::endl;
     }
 }
 
-void Motor::write2OnAddress(uint16_t address, uint16_t data) {
+void Motor::write2OnAddress(uint8_t id, uint16_t address, uint16_t data) {
     uint8_t dxl_error = 0;
-    int dxl_comm_result = packetHandler_->write2ByteTxRx(portHandler_, id_, address, data, &dxl_error);
+    int dxl_comm_result = packetHandler_->write2ByteTxRx(portHandler_, id, address, data, &dxl_error);
     if (dxl_comm_result != COMM_SUCCESS || dxl_error != 0) {
-        std::cerr << "Failed to write input: " << data << " with address: " << address << " for [ID:" << id_ << "]" << std::endl;
+        std::cerr << "Failed to write input: " << data << " with address: " << address << " for [ID:" << id << "]" << std::endl;
     }
     else {
-        std::cout << "Success to write input: " << data << " with address: " << address << " for [ID:" << id_ << "]" << std::endl;
+        std::cout << "Success to write input: " << data << " with address: " << address << " for [ID:" << id << "]" << std::endl;
     }
 }
 
-uint8_t Motor::read1FromAddress(uint16_t address) {
+uint8_t Motor::read1FromAddress(uint8_t id, uint16_t address) {
     uint8_t data;
     uint8_t dxl_error;
-    int dxl_comm_result = packetHandler_->read1ByteTxRx(portHandler_, id_, address, &data, &dxl_error);
+    int dxl_comm_result = packetHandler_->read1ByteTxRx(portHandler_, id, address, &data, &dxl_error);
     if (dxl_comm_result != COMM_SUCCESS) {
-        std::cerr << "Failed to read from address: " << address << " for [ID:" << id_ << "]" << std::endl;
+        std::cerr << "Failed to read from address: " << address << " for [ID:" << id << "]" << std::endl;
     }
     else {
-        std::cout << "Success to read from address: " << address << " for [ID:" << id_ << "]" << std::endl;
+        std::cout << "Success to read from address: " << address << " for [ID:" << id << "]" << std::endl;
     }
     return data;
 }
 
-uint16_t Motor::read2FromAddress(uint16_t address) {
+uint16_t Motor::read2FromAddress(uint8_t id, uint16_t address) {
     uint16_t data;
     uint8_t dxl_error;
-    int dxl_comm_result = packetHandler_->read2ByteTxRx(portHandler_, id_, address, &data, &dxl_error);
+    int dxl_comm_result = packetHandler_->read2ByteTxRx(portHandler_, id, address, &data, &dxl_error);
     if (dxl_comm_result != COMM_SUCCESS) {
-        std::cerr << "Failed to read from address: " << address << " for [ID:" << id_ << "]" << std::endl;
+        std::cerr << "Failed to read from address: " << address << " for [ID:" << id << "]" << std::endl;
     }
     else {
-        std::cout << "Success to read from address: " << address << " for [ID:" << id_ << "]" << std::endl;
+        std::cout << "Success to read from address: " << address << " for [ID:" << id << "]" << std::endl;
     }
     return data;
 }

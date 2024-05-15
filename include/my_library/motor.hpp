@@ -39,19 +39,17 @@ public:
 
 
 
-    void setTargetPosition(float position);
-    uint8_t readPresentPosition();
+    void setTargetPosition(uint8_t id, float position);
+    uint16_t readPresentPosition(uint8_t id);
 
 
 
-    void write1OnAddress(uint16_t address, uint8_t data);
-    void write2OnAddress(uint16_t address, uint16_t data);
-    uint8_t read1FromAddress(uint16_t address);
-    uint16_t read2FromAddress(uint16_t address);
+    void write1OnAddress(uint8_t id, uint16_t address, uint8_t data);
+    void write2OnAddress(uint8_t id, uint16_t address, uint16_t data);
+    uint8_t read1FromAddress(uint8_t id, uint16_t address);
+    uint16_t read2FromAddress(uint8_t id, uint16_t address);
 
 
-
-    // setTargerPosition, getTargetPosition?, getPresentPosition, setSpeed, getSpeed .
 
 };
 
