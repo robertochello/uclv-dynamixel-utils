@@ -87,18 +87,18 @@ public:
 
 
     float rad_to_degrees(float radians);
-    float degrees_to_position(float degrees);
+    uint16_t degrees_to_position(float degrees);
 
     float degrees_to_rad(float degrees);
-    float position_to_degrees(float position);
+    float position_to_degrees(uint16_t position);
 
     // shared pointer per la creazione del motore? forse no perc
     std::shared_ptr<FingerMotor> createFingerMotor(uint8_t id);
     std::shared_ptr<WristMotor> createWristMotor(uint8_t id);
 
 
-    void addFingerMotor(uint8_t id);    
-    void addWristMotor(uint8_t id);
+    std::vector<std::shared_ptr<FingerMotor>> addFingerMotor(uint8_t id);    
+    std::vector<std::shared_ptr<WristMotor>> addWristMotor(uint8_t id);
 
     void addMotor(std::shared_ptr<FingerMotor>& fingerMotor);
     void addMotor(std::shared_ptr<WristMotor>& wristMotor);
@@ -117,21 +117,21 @@ public:
 
 
     // move
-    void Hand::moveFingerMotor(const uint8_t& id, const float& position);
-    void Hand::moveWristMotor(const uint8_t& id, const float& position);
+    void moveFingerMotor(const uint8_t& id, const float& position);
+    void moveWristMotor(const uint8_t& id, const float& position);
 
     // read
-    float Hand::readFingerPositionMotor(const uint8_t& id);
-    float Hand::readWristPositionMotor(const uint8_t& id);
+    float readFingerPositionMotor(const uint8_t& id);
+    float readWristPositionMotor(const uint8_t& id);
 
 
 
 
 
     // muove più motori con bulk
-    void Hand::moveMotorsBulk(const std::vector<uint16_t>& ids, const std::vector<double>& positions);
+    void moveMotorsBulk(const std::vector<uint16_t>& ids, const std::vector<double>& positions);
     // leggi posizioni motori con bulk
-    void Hand::readMotorsBulk(const std::vector<uint16_t>& ids);
+    std::vector<float> readMotorsBulk(const std::vector<uint16_t>& ids);
 
 
 
