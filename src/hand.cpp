@@ -143,8 +143,8 @@ std::shared_ptr<WristMotor> Hand::createWristMotor(uint8_t id) {
 std::vector<std::shared_ptr<FingerMotor>> Hand::addFingerMotor(uint8_t id) {
     for (const auto& motor : fingerMotors_) {
         if (motor->getId() == id) {
-            // std::cout << "FingerMotor with ID " << id << " already exists in the list." << std::endl;
-            exit;
+            std::cout << "FingerMotor with ID " << id << " already exists in the list." << std::endl;
+            return fingerMotors_;
         }
     }
     fingerMotors_.push_back(std::make_shared<FingerMotor>(serial_port_, baudrate_, protocol_version_, portHandler_, packetHandler_, id));
@@ -155,8 +155,8 @@ std::vector<std::shared_ptr<FingerMotor>> Hand::addFingerMotor(uint8_t id) {
 std::vector<std::shared_ptr<WristMotor>> Hand::addWristMotor(uint8_t id) {
     for (const auto& motor : wristMotors_) {
         if (motor->getId() == id) {
-            // std::cout << "WristMotor with ID " << id << " already exists in the list." << std::endl;
-            exit;
+            std::cout << "WristMotor with ID " << id << " already exists in the list." << std::endl;
+            return wristMotors_;
         }
     }
     wristMotors_.push_back(std::make_shared<WristMotor>(serial_port_, baudrate_, protocol_version_, portHandler_, packetHandler_, id));
@@ -175,10 +175,13 @@ void Hand::printFingerMotors() const {
     if (fingerMotors_.empty()) {
         std::cout << "No Finger Motors found." << std::endl;
         return;
-    }
-    std::cout << "Finger Motors:" << std::endl;
-    for (const auto& motor : fingerMotors_) {
-        std::cout << "ID: " << motor->getId() << std::endl;
+    } else
+    {
+        std::cout << "Finger Motors:" << std::endl;
+        for (size_t i = 0; i < fingerMotors_.size(); i++)
+        {
+            std::cout << "Index: " << i <<" - ID: " << fingerMotors_[i]->getId() << std::endl;
+        }
     }
 }
 
@@ -187,10 +190,13 @@ void Hand::printWristMotors() const {
     if (wristMotors_.empty()) {
         std::cout << "No Wrist Motors found." << std::endl;
         return;
-    }
-    std::cout << "Wrist Motors:" << std::endl;
-    for (const auto& motor : wristMotors_) {
-        std::cout << "ID: " << motor->getId() << std::endl;
+    } else
+    {
+        std::cout << "Wrist Motors:" << std::endl;
+        for (size_t i = 0; i < wristMotors_.size(); i++)
+        {
+            std::cout << "Index: " << i <<" - ID: " << wristMotors_[i]->getId() << std::endl;
+        }
     }
 }
 
@@ -233,9 +239,9 @@ void Hand::removeWristMotor(uint8_t id) {
 
 void Hand::moveFingerMotor(const uint8_t& id, const float& position) {
     uint8_t id_motor = fingerMotors_[id]->getId(); 
-    // float degrees = rad_to_degrees(position);
-    // uint16_t x = degrees_to_position(degrees);
-    fingerMotors_[id]->setTargetPosition(id_motor, position);
+    float degrees = rad_to_degrees(position);
+    uint16_t x = degrees_to_position(degrees);
+    fingerMotors_[id]->setTargetPosition(id_motor, x);
 }
 void Hand::moveWristMotor(const uint8_t& id, const float& position) {
     uint8_t id_motor = wristMotors_[id]->getId();
@@ -271,7 +277,7 @@ float Hand::readWristPositionMotor(const uint8_t& id) {
 
 
 
-void Hand::moveMotorsBulk(const std::vector<uint16_t>& ids, const std::vector<double>& positions) {
+void Hand::moveMotorsBulk(const std::vector<uint16_t>& ids, const std::vector<int>& positions) {
     uint8_t param_target_position[2];
     if (!groupBulkWrite_)
     {
@@ -286,14 +292,13 @@ void Hand::moveMotorsBulk(const std::vector<uint16_t>& ids, const std::vector<do
         for (size_t i = 0; i < ids.size(); i++)
         {   
             param_target_position[0] = DXL_LOBYTE(DXL_LOWORD(positions[i]));
-            param_target_position[1] = DXL_LOBYTE(DXL_LOWORD(positions[i]));
+            param_target_position[1] = DXL_HIBYTE(DXL_LOWORD(positions[i]));
             if (ids[i] > 33 && ids[i] < 39) {
-                uint8_t id_motor = fingerMotors_[ids[i]-1]->getId();
-                groupBulkWrite_->addParam(id_motor, 30, 2, param_target_position);
+                
+                groupBulkWrite_->addParam(fingerMotors_[ids[i]]->getId(), 30, 2, param_target_position);
             } else if (ids[i] > 30 && ids[i] < 34)
             {
-                uint8_t id_motor = wristMotors_[ids[i]-1]->getId();
-                groupBulkWrite_->addParam(id_motor, 30, 2, param_target_position);
+                groupBulkWrite_->addParam(wristMotors_[ids[i]]->getId(), 30, 2, param_target_position);
             } else return;  //ERRORE
             
         }

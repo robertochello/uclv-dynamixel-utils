@@ -129,7 +129,7 @@ public:
 
 
     // muove più motori con bulk
-    void moveMotorsBulk(const std::vector<uint16_t>& ids, const std::vector<double>& positions);
+    void moveMotorsBulk(const std::vector<uint16_t>& ids, const std::vector<int>& positions);
     // leggi posizioni motori con bulk
     std::vector<float> readMotorsBulk(const std::vector<uint16_t>& ids);
 
