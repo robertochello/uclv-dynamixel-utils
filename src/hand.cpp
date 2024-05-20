@@ -123,6 +123,13 @@ float Hand::position_to_degrees(uint16_t position) {
 
 
 
+std::vector<std::shared_ptr<FingerMotor>> Hand::getFingerMotors() {
+    return fingerMotors_;
+}
+
+std::vector<std::shared_ptr<WristMotor>> Hand::getWristMotors() {
+    return wristMotors_;
+}
 
 
 
@@ -279,22 +286,22 @@ float Hand::readWristPositionMotor(const uint8_t& id) {
 
 void Hand::moveMotorsBulk(const std::vector<uint16_t>& ids, const std::vector<int>& positions) {
     uint8_t param_target_position[2];
+    uint8_t motor_id;
     if (!groupBulkWrite_)
-    {
+    {   
         groupBulkWrite_ = std::make_unique<dynamixel::GroupBulkWrite>(portHandler_, packetHandler_);
     }
     if (ids.size() != positions.size()) {
-        // ERRORE
         return;
     }
     else
-    {
-        for (size_t i = 0; i < ids.size(); i++)
+    {   
+        for (size_t i = 0; i < positions.size(); i++)
         {   
+            motor_id = fingerMotors_[ids[i]]->getId();
             param_target_position[0] = DXL_LOBYTE(DXL_LOWORD(positions[i]));
             param_target_position[1] = DXL_HIBYTE(DXL_LOWORD(positions[i]));
-            if (ids[i] > 33 && ids[i] < 39) {
-                
+            if (motor_id > 33 && motor_id < 39) {
                 groupBulkWrite_->addParam(fingerMotors_[ids[i]]->getId(), 30, 2, param_target_position);
             } else if (ids[i] > 30 && ids[i] < 34)
             {
