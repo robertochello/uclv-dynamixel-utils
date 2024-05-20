@@ -320,33 +320,34 @@ void Hand::moveMotorsBulk(const std::vector<uint16_t>& ids, const std::vector<in
 // TEST
 std::vector<float> Hand::readMotorsBulk(const std::vector<uint16_t>& ids) {
     std::vector<float> positions;
+    uint8_t motor_id;
     if (!groupBulkRead_) {
         groupBulkRead_ = std::make_unique<dynamixel::GroupBulkRead>(portHandler_, packetHandler_);
     }
     for (size_t i = 0; i < ids.size(); i++)
     {
         if (ids[i] > 33 && ids[i] < 39) {
-                uint8_t id_motor = fingerMotors_[ids[i]]->getId();
-                groupBulkRead_->addParam(id_motor, 30, 2);
+                motor_id = fingerMotors_[ids[i]]->getId();
+                groupBulkRead_->addParam(motor_id, 30, 2);
             } else if (ids[i] > 30 && ids[i] < 34)
             {
-                uint8_t id_motor = wristMotors_[ids[i]]->getId();
-                groupBulkRead_->addParam(id_motor, 30, 2);
+                motor_id = wristMotors_[ids[i]]->getId();
+                groupBulkRead_->addParam(motor_id, 30, 2);
             } else exit;  //ERRORE
     }
     groupBulkRead_->txRxPacket();
     for (size_t i = 0; i < ids.size(); i++)
     {
         if (ids[i] > 33 && ids[i] < 39) {
-                uint8_t id_motor = fingerMotors_[ids[i]]->getId();
-                groupBulkRead_->isAvailable(id_motor, 30, 2);
-                float position = groupBulkRead_->getData(id_motor, 30, 2);
+                motor_id= fingerMotors_[ids[i]]->getId();
+                groupBulkRead_->isAvailable(motor_id, 30, 2);
+                float position = groupBulkRead_->getData(motor_id, 30, 2);
                 positions.push_back(position);
             } else if (ids[i] > 30 && ids[i] < 34)
             {
-                uint8_t id_motor = wristMotors_[ids[i]]->getId();
-                groupBulkRead_->isAvailable(id_motor, 30, 2);
-                float position = groupBulkRead_->getData(id_motor, 30, 2);
+                motor_id = wristMotors_[ids[i]]->getId();
+                groupBulkRead_->isAvailable(motor_id, 30, 2);
+                float position = groupBulkRead_->getData(motor_id, 30, 2);
                 positions.push_back(position);
             } else exit;  //ERRORE
     }
