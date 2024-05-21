@@ -285,31 +285,48 @@ float Hand::readWristPositionMotor(const uint8_t& id) {
 
 
 void Hand::moveMotorsBulk(const std::vector<uint16_t>& ids, const std::vector<int>& positions) {
-    uint8_t param_target_position[2];
-    uint8_t motor_id;
-    if (!groupBulkWrite_)
-    {   
+    if (!groupBulkWrite_) {
         groupBulkWrite_ = std::make_unique<dynamixel::GroupBulkWrite>(portHandler_, packetHandler_);
     }
+
     if (ids.size() != positions.size()) {
+        std::cerr << "Error: Mismatched IDs and positions sizes." << std::endl;
         return;
     }
-    else
-    {   
-        for (size_t i = 0; i < positions.size(); i++)
-        {   
-            motor_id = fingerMotors_[ids[i]]->getId();
-            param_target_position[0] = DXL_LOBYTE(DXL_LOWORD(positions[i]));
-            param_target_position[1] = DXL_HIBYTE(DXL_LOWORD(positions[i]));
-            if (motor_id > 33 && motor_id < 39) {
-                groupBulkWrite_->addParam(fingerMotors_[ids[i]]->getId(), 30, 2, param_target_position);
-            } else if (ids[i] > 30 && ids[i] < 34)
-            {
-                groupBulkWrite_->addParam(wristMotors_[ids[i]]->getId(), 30, 2, param_target_position);
-            } else return;  //ERRORE
-            
+
+    uint8_t param_target_position[2];
+    for (size_t i = 0; i < ids.size(); i++) {
+        param_target_position[0] = DXL_LOBYTE(DXL_LOWORD(positions[i]));
+        param_target_position[1] = DXL_HIBYTE(DXL_LOWORD(positions[i]));
+        uint16_t motor_id = ids[i];
+
+        bool motor_found = false;
+        for (const auto& motor : fingerMotors_) {
+            if (motor->getId() == motor_id) {
+                groupBulkWrite_->addParam(motor_id, 30, 2, param_target_position);
+                motor_found = true;
+                break;
+            }
         }
-        groupBulkWrite_->txPacket();
+
+        if (!motor_found) {
+            for (const auto& motor : wristMotors_) {
+                if (motor->getId() == motor_id) {
+                    groupBulkWrite_->addParam(motor_id, 30, 2, param_target_position);
+                    motor_found = true;
+                    break;
+                }
+            }
+        }
+
+        if (!motor_found) {
+            std::cerr << "Error: Motor ID " << motor_id << " not found." << std::endl;
+            return;
+        }
+    }
+
+    if (groupBulkWrite_->txPacket() != COMM_SUCCESS) {
+        std::cerr << "Error: Failed to transmit bulk write packet." << std::endl;
     }
 }
 
@@ -317,39 +334,83 @@ void Hand::moveMotorsBulk(const std::vector<uint16_t>& ids, const std::vector<in
 
 
 
-// TEST
+
+
 std::vector<float> Hand::readMotorsBulk(const std::vector<uint16_t>& ids) {
     std::vector<float> positions;
-    uint8_t motor_id;
     if (!groupBulkRead_) {
         groupBulkRead_ = std::make_unique<dynamixel::GroupBulkRead>(portHandler_, packetHandler_);
     }
-    for (size_t i = 0; i < ids.size(); i++)
-    {
-        if (ids[i] > 33 && ids[i] < 39) {
-                motor_id = fingerMotors_[ids[i]]->getId();
-                groupBulkRead_->addParam(motor_id, 30, 2);
-            } else if (ids[i] > 30 && ids[i] < 34)
-            {
-                motor_id = wristMotors_[ids[i]]->getId();
-                groupBulkRead_->addParam(motor_id, 30, 2);
-            } else exit;  //ERRORE
+    groupBulkRead_->clearParam();
+
+    for (size_t i = 0; i < ids.size(); i++) {
+        uint16_t motor_id = ids[i];
+        bool motor_found = false;
+        for (const auto& motor : fingerMotors_) {
+            if (motor->getId() == motor_id) {
+                if (!groupBulkRead_->addParam(motor_id, 30, 2)) {
+                    std::cerr << "Failed to add FingerMotor ID " << motor_id << " to bulk read." << std::endl;
+                }
+                motor_found = true;
+                break;
+            }
+        }
+        if (!motor_found) {
+            for (const auto& motor : wristMotors_) {
+                if (motor->getId() == motor_id) {
+                    if (!groupBulkRead_->addParam(motor_id, 30, 2)) {
+                        std::cerr << "Failed to add WristMotor ID " << motor_id << " to bulk read." << std::endl;
+                    }
+                    motor_found = true;
+                    break;
+                }
+            }
+        }
+        if (!motor_found) {
+            std::cerr << "Error: Motor ID " << motor_id << " not found." << std::endl;
+            return positions;
+        }
     }
-    groupBulkRead_->txRxPacket();
-    for (size_t i = 0; i < ids.size(); i++)
-    {
-        if (ids[i] > 33 && ids[i] < 39) {
-                motor_id= fingerMotors_[ids[i]]->getId();
-                groupBulkRead_->isAvailable(motor_id, 30, 2);
-                float position = groupBulkRead_->getData(motor_id, 30, 2);
-                positions.push_back(position);
-            } else if (ids[i] > 30 && ids[i] < 34)
-            {
-                motor_id = wristMotors_[ids[i]]->getId();
-                groupBulkRead_->isAvailable(motor_id, 30, 2);
-                float position = groupBulkRead_->getData(motor_id, 30, 2);
-                positions.push_back(position);
-            } else exit;  //ERRORE
+    if (groupBulkRead_->txRxPacket() != COMM_SUCCESS) {
+        std::cerr << "Failed to execute bulk read." << std::endl;
+        return positions;
     }
+    for (size_t i = 0; i < ids.size(); i++) {
+        uint16_t motor_id = ids[i];
+        bool motor_found = false;
+
+        for (const auto& motor : fingerMotors_) {
+            if (motor->getId() == motor_id) {
+                if (groupBulkRead_->isAvailable(motor_id, 30, 2)) {
+                    int32_t position_data = groupBulkRead_->getData(motor_id, 30, 2);
+                    positions.push_back(static_cast<float>(position_data));
+                } else {
+                    std::cerr << "Data not available for FingerMotor ID " << motor_id << "." << std::endl;
+                }
+                motor_found = true;
+                break;
+            }
+        }
+
+        if (!motor_found) {
+            for (const auto& motor : wristMotors_) {
+                if (motor->getId() == motor_id) {
+                    if (groupBulkRead_->isAvailable(motor_id, 30, 2)) {
+                        int32_t position_data = groupBulkRead_->getData(motor_id, 30, 2);
+                        positions.push_back(static_cast<float>(position_data));
+                    } else {
+                        std::cerr << "Data not available for WristMotor ID " << motor_id << "." << std::endl;
+                    }
+                    motor_found = true;
+                    break;
+                }
+            }
+        }
+
+        if (!motor_found) {
+            std::cerr << "Error: Motor ID " << motor_id << " not found during data retrieval." << std::endl;
+        }
+    }
+
     return positions;
 }
