@@ -29,11 +29,9 @@ private:
     dynamixel::PacketHandler *packetHandler_;
 
 
-    // più shared pointer possono puntare allo stesso oggetto e l'oggetto verrà eliminato quando l'ultimo shared pointer esce dallo scope
     std::vector<std::shared_ptr<FingerMotor>> fingerMotors_;
     std::vector<std::shared_ptr<WristMotor>> wristMotors_;
 
-    // può esserci solo uno unique_ptr che punta a quell'oggetto 
     std::unique_ptr<dynamixel::GroupSyncWrite> groupSyncWrite_ = nullptr;
     std::unique_ptr<dynamixel::GroupSyncRead> groupSyncRead_ = nullptr;
 
@@ -43,13 +41,6 @@ private:
 
 
 public:
-
-    /*
-        const std::string& serial_port - il costruttore può accedere al nome della porta seriale senza effettuare una copia dell'oggetto
-        dynamixel::PortHandler *const& portHandler - puntatore costante all'oggetto dynamixel::PortHandler, in questo modo il costruttore può
-                                                    accedere all'oggetto portHandler senza modificarlo
-        dynamixel::PacketHandler *const& packetHandler - come sopra
-    */
     Hand(const std::string& serial_port, int baudrate, float protocol_version, 
             dynamixel::PortHandler *const& portHandler, dynamixel::PacketHandler *const& packetHandler);
 
@@ -57,7 +48,6 @@ public:
 
     Hand();
 
-    // distrutto portHandler e packetHandler
     ~Hand();
 
 
@@ -77,9 +67,7 @@ public:
     void setPacketHandler(dynamixel::PacketHandler *packetHandler);
 
 
-    // ESISTONO GIA IN DYNAMIXEL
-    // dynamixel::PortHandler* getPortHandler() const;
-    // dynamixel::PacketHandler* getPacketHandler() const;
+
 
 
     // for stable communication with high Baudrate, USB latency values must be setted to the lower
@@ -111,7 +99,6 @@ public:
     void printFingerMotors() const;
     void printWristMotors() const;
 
-    void printMotors() const;
 
     void removeFingerMotor(uint8_t id);
     void removeWristMotor(uint8_t id);
@@ -134,9 +121,9 @@ public:
 
 
     // muove più motori con bulk
-    void moveMotorsBulk(const std::vector<uint16_t>& ids, const std::vector<int>& positions);
+    void moveMotors(const std::vector<uint16_t>& ids, const std::vector<int>& positions);
     // leggi posizioni motori con bulk
-    std::vector<float> readMotorsBulk(const std::vector<uint16_t>& ids);
+    std::vector<float> readMotorsPositions(const std::vector<uint16_t>& ids);
 
 
 
