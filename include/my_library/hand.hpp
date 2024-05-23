@@ -85,12 +85,12 @@ public:
     std::shared_ptr<WristMotor> createWristMotor(uint8_t id);
 
 
-    std::vector<std::shared_ptr<FingerMotor>> addFingerMotor(uint8_t id);    
-    std::vector<std::shared_ptr<WristMotor>> addWristMotor(uint8_t id);
+    const std::vector<std::shared_ptr<FingerMotor>>& Hand::addFingerMotor(uint8_t id); 
+    const std::vector<std::shared_ptr<WristMotor>>& Hand::addWristMotor(uint8_t id);
 
     void addMotor(std::shared_ptr<FingerMotor>& fingerMotor);
     void addMotor(std::shared_ptr<WristMotor>& wristMotor);
- 
+
 
     std::vector<std::shared_ptr<FingerMotor>> getFingerMotors();
     std::vector<std::shared_ptr<WristMotor>> getWristMotors();

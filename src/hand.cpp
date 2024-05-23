@@ -273,8 +273,10 @@ const std::vector<std::shared_ptr<WristMotor>>& Hand::addWristMotor(uint8_t id) 
         if (motor->getId() == id) {
             // If a motor with the specified ID is found, print a message and return the current list
             std::cout << "WristMotor with ID " << id << " already exists in the list." << std::endl;
-            return
-
+            return wristMotors_;
+        }
+    }
+}
 
 
 /**
@@ -314,7 +316,7 @@ const std::vector<std::shared_ptr<FingerMotor>>& Hand::addFingerMotor(uint8_t id
  */
 const std::vector<std::shared_ptr<WristMotor>>& Hand::addWristMotor(uint8_t id) {
     // Iterate through the existing finger motors to check if the motor with the specified ID already exists
-    for (const auto& motor : WristMotors_) {
+    for (const auto& motor : wristMotors_) {
         if (motor->getId() == id) {
             // If a motor with the specified ID is found, print a message and return the current list
             std::cout << "WristMotor with ID " << id << " already exists in the list." << std::endl;
@@ -460,7 +462,7 @@ void Hand::moveFingerMotor(const uint8_t& id, const float& position) {
  */
 void Hand::moveWristMotor(const uint8_t& id, const float& position) {
     // Get the ID of the motor from the list of finger motors
-    uint8_t id_motor = wristMotors_Motors_[id]->getId();
+    uint8_t id_motor = wristMotors_[id]->getId();
     
     // Set the target position for the specified motor
     wristMotors_[id]->setTargetPosition(id_motor, position);
