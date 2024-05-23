@@ -85,8 +85,8 @@ public:
     std::shared_ptr<WristMotor> createWristMotor(uint8_t id);
 
 
-    const std::vector<std::shared_ptr<FingerMotor>>& Hand::addFingerMotor(uint8_t id); 
-    const std::vector<std::shared_ptr<WristMotor>>& Hand::addWristMotor(uint8_t id);
+    const std::vector<std::shared_ptr<FingerMotor>>& addFingerMotor(uint8_t id); 
+    const std::vector<std::shared_ptr<WristMotor>>& addWristMotor(uint8_t id);
 
     void addMotor(std::shared_ptr<FingerMotor>& fingerMotor);
     void addMotor(std::shared_ptr<WristMotor>& wristMotor);
@@ -121,9 +121,9 @@ public:
 
 
     // muove più motori con bulk
-    void moveMotors(const std::vector<uint16_t>& ids, const std::vector<int>& positions);
+    void moveMotors(const std::vector<uint16_t>& ids, const std::vector<uint32_t>& positions);
     // leggi posizioni motori con bulk
-    std::vector<float> readMotorsPositions(const std::vector<uint16_t>& ids);
+    std::vector<uint32_t> readMotorsPositions(const std::vector<uint16_t>& ids);
 
 
 
