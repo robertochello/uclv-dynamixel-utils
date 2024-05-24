@@ -253,7 +253,6 @@ const std::vector<std::shared_ptr<FingerMotor>>& Hand::addFingerMotor(uint8_t id
             return fingerMotors_;
         }
     }
-    
     // If no motor with the specified ID is found, create a new FingerMotor and add it to the list
     fingerMotors_.push_back(createFingerMotor(id));
     std::cout << "FingerMotor with ID " << (unsigned int)id << " created." << std::endl;
@@ -278,6 +277,10 @@ const std::vector<std::shared_ptr<WristMotor>>& Hand::addWristMotor(uint8_t id) 
             return wristMotors_;
         }
     }
+    // If no motor with the specified ID is found, create a new FingerMotor and add it to the list
+    wristMotors_.push_back(createWristMotor(id));
+    std::cout << "WristMotor with ID " << (unsigned int)id << " created." << std::endl;
+    return wristMotors_;
 }
 
 
@@ -392,11 +395,18 @@ void Hand::removeWristMotor(uint8_t id) {
  * @param position The target position for the FingerMotor. It should be a value between 0 and 4095.
  */
 void Hand::moveFingerMotor(const uint8_t& id, const float& position) {
-    // Get the ID of the motor from the list of finger motors
-    uint8_t id_motor = fingerMotors_[id]->getId();
-    // Set the target position for the specified motor
-    fingerMotors_[id]->setTargetPosition(id_motor, position);
+    // Search for the motor with the specified id
+    for (const auto& motor : fingerMotors_) {
+        if (motor->getId() == id) {
+            // Set the target position for the found motor
+            motor->setTargetPosition(id, position);
+            return;
+        }
+    }
+    // If the motor with the specified id is not found
+    std::cerr << "Finger Motor with ID " << (unsigned int)(id) << " not found." << std::endl;
 }
+
 
 /**
  * @brief Moves a wrist motor to a specified position.
@@ -408,11 +418,16 @@ void Hand::moveFingerMotor(const uint8_t& id, const float& position) {
  * @param position The target position for the WristMotor. It should be a value between 0 and 4095.
  */
 void Hand::moveWristMotor(const uint8_t& id, const float& position) {
-    // Get the ID of the motor from the list of finger motors
-    uint8_t id_motor = wristMotors_[id]->getId();
-    
-    // Set the target position for the specified motor
-    wristMotors_[id]->setTargetPosition(id_motor, position);
+    // Search for the motor with the specified id
+    for (const auto& motor : wristMotors_) {
+        if (motor->getId() == id) {
+            // Set the target position for the found motor
+            motor->setTargetPosition(id, position);
+            return;
+        }
+    }
+    // If the motor with the specified id is not found
+    std::cerr << "Wrist Motor with ID " << (unsigned int)(id) << " not found." << std::endl;
 }
 
 
@@ -501,9 +516,7 @@ void Hand::moveMotors(const std::vector<uint16_t>& ids, const std::vector<float>
         // Search for the motor in fingerMotors_
         for (const auto& motor : fingerMotors_) {
             if (motor->getId() == motor_id) {
-                if(!groupBulkWrite_->addParam(motor_id, 30, 2, param_target_position)) { // ADDPARAM POTREBBE ESSERE DEL MOTORE OPPURE METTERE GET_ADDRESSPOSITION INVECE DI 30
-                    std::cerr << "Error during groupBulkWrite.addParam()\n";
-                }
+                groupBulkWrite_->addParam(motor_id, motor->getAddrTargetPosition(), motor->getLenAddrTargetPosition(), param_target_position);
                 motor_found = true;
                 break;
             }
@@ -513,7 +526,7 @@ void Hand::moveMotors(const std::vector<uint16_t>& ids, const std::vector<float>
         if (!motor_found) {
             for (const auto& motor : wristMotors_) {
                 if (motor->getId() == motor_id) {
-                    groupBulkWrite_->addParam(motor_id, 30, 2, param_target_position);
+                    groupBulkWrite_->addParam(motor_id, motor->getAddrTargetPosition(), motor->getLenAddrTargetPosition(), param_target_position);
                     motor_found = true;
                     break;
                 }
@@ -610,8 +623,8 @@ std::vector<uint32_t> Hand::readMotorsPositions(const std::vector<uint16_t>& ids
         // Search for the motor in fingerMotors_
         for (const auto& motor : fingerMotors_) {
             if (motor->getId() == motor_id) {
-                if (groupBulkRead_->isAvailable(motor_id, 30, 2)) {
-                    int32_t position_data = groupBulkRead_->getData(motor_id, 30, 2);
+                if (groupBulkRead_->isAvailable(motor_id, motor->getAddrPresentPosition(), motor->getLenAddrPresentPosition())) {
+                    int32_t position_data = groupBulkRead_->getData(motor_id, motor->getAddrPresentPosition(), motor->getLenAddrPresentPosition());
                     positions.push_back(static_cast<uint32_t>(position_data));
                 } else {
                     std::cerr << "Data not available for FingerMotor ID " << motor_id << "." << std::endl;
@@ -625,8 +638,8 @@ std::vector<uint32_t> Hand::readMotorsPositions(const std::vector<uint16_t>& ids
         if (!motor_found) {
             for (const auto& motor : wristMotors_) {
                 if (motor->getId() == motor_id) {
-                    if (groupBulkRead_->isAvailable(motor_id, 30, 2)) {
-                        int32_t position_data = groupBulkRead_->getData(motor_id, 30, 2);
+                    if (groupBulkRead_->isAvailable(motor_id, motor->getAddrPresentPosition(), motor->getLenAddrPresentPosition())) {
+                        int32_t position_data = groupBulkRead_->getData(motor_id, motor->getAddrPresentPosition(), motor->getLenAddrPresentPosition());
                         positions.push_back(static_cast<uint32_t>(position_data));
                     } else {
                         std::cerr << "Data not available for WristMotor ID " << motor_id << "." << std::endl;

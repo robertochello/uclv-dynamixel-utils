@@ -22,7 +22,12 @@ Motor::Motor(const std::string& serial_port, int baudrate, float protocol_versio
     protocol_version_(protocol_version),
     portHandler_(portHandler),
     packetHandler_(packetHandler),
-    id_(id) {}
+    id_(id),
+    addrTargetPosition_(30),
+    addrPresentPosition_(36),
+    addrTorqueEnable_(24),
+    lenAddrTargetPosition_(2),
+    lenAddrPresentPosition_(2) {}
 
 /**
  * @brief Constructor of the Motor class.
@@ -41,11 +46,16 @@ Motor::Motor(const std::string& serial_port, int baudrate, float protocol_versio
     serial_port_(serial_port),
     baudrate_(baudrate),
     protocol_version_(protocol_version),
-    id_(id)
-{
-    portHandler_ = dynamixel::PortHandler::getPortHandler(serial_port.c_str());
-    packetHandler_ = dynamixel::PacketHandler::getPacketHandler(protocol_version);
-}
+    id_(id),
+    addrTargetPosition_(30),
+    addrPresentPosition_(36),
+    addrTorqueEnable_(24),
+    lenAddrTargetPosition_(2),
+    lenAddrPresentPosition_(2)
+    {
+        portHandler_ = dynamixel::PortHandler::getPortHandler(serial_port.c_str());
+        packetHandler_ = dynamixel::PacketHandler::getPacketHandler(protocol_version);
+    }
 
 /**
  * @brief Default constructor of the Motor class.
@@ -59,7 +69,12 @@ Motor::Motor()
     protocol_version_(0),
     id_(0),
     portHandler_(nullptr),
-    packetHandler_(nullptr) {}
+    packetHandler_(nullptr),
+    addrTargetPosition_(30),
+    addrPresentPosition_(36),
+    addrTorqueEnable_(24),
+    lenAddrTargetPosition_(2),
+    lenAddrPresentPosition_(2) {}
 
 /**
  * @brief Sets the ID of the motor.
@@ -80,39 +95,86 @@ int Motor::getId() {
 }
 
 /**
- * @brief Sets the port handler for the motor.
+ * @brief Sets the address for the target position.
  * 
- * @param portHandler Pointer to the new port handler.
+ * @param addrTargetPosition The address to be set for the target position.
  */
-void Motor::setPortHandler(dynamixel::PortHandler *portHandler) {
-    portHandler_ = portHandler;
+void Motor::setAddrTargetPosition(uint16_t addrTargetPosition) {
+    addrTargetPosition_ = addrTargetPosition;
 }
 
 /**
- * @brief Sets the packet handler for the motor.
+ * @brief Gets the address for the target position.
  * 
- * @param packetHandler Pointer to the new packet handler.
+ * @return The address for the target position.
  */
-void Motor::setPacketHandler(dynamixel::PacketHandler *packetHandler) {
-    packetHandler_ = packetHandler;
+uint16_t Motor::getAddrTargetPosition() const {
+    return addrTargetPosition_;
 }
 
 /**
- * @brief Gets the port handler of the motor.
+ * @brief Sets the address for the present position.
  * 
- * @return Pointer to the port handler.
+ * @param addrPresentPosition The address to be set for the present position.
  */
-dynamixel::PortHandler* Motor::getPortHandler() const {
-    return portHandler_;
+void Motor::setAddrPresentPosition(uint16_t addrPresentPosition) {
+    addrPresentPosition_ = addrPresentPosition;
 }
 
 /**
- * @brief Gets the packet handler of the motor.
+ * @brief Gets the address for the present position.
  * 
- * @return Pointer to the packet handler.
+ * @return The address for the present position.
  */
-dynamixel::PacketHandler* Motor::getPacketHandler() const {
-    return packetHandler_;
+uint16_t Motor::getAddrPresentPosition() const {
+    return addrPresentPosition_;
+}
+
+/**
+ * @brief Sets the size (nr of bytes to write) for address of the target position.
+ * 
+ * @param lenAddrTargetPosition The size to be set for length of address for target position.
+ */
+void Motor::setLenAddrTargetPosition(uint16_t lenAddrTargetPosition) {
+    lenAddrTargetPosition_ = lenAddrTargetPosition;
+}
+
+/**
+ * @brief Gets the size (nr of bytes to write) for address of the target position.
+ * 
+ * @return  The size to be set for length of address for target position.
+ */
+uint16_t Motor::getLenAddrTargetPosition() const {
+    return lenAddrTargetPosition_;
+}
+
+/**
+ * @brief Sets the size (nr of bytes to write) for address of the present position.
+ * 
+ * @param lenAddrPresentPosition The size to be set for length of address for present position.
+ */
+void Motor::setLenAddrPresentPosition(uint16_t lenAddrPresentPosition) {
+    lenAddrPresentPosition_ = lenAddrPresentPosition;
+}
+
+/**
+ * @brief Gets the size (nr of bytes to write) for address of the present position.
+ * 
+ * @return  The size to be set for length of address for present position.
+ */
+uint16_t Motor::getLenAddrPresentPosition() const {
+    return lenAddrPresentPosition_;
+}
+
+
+
+
+void Motor::setAddrTorqueEnable(uint16_t addrTorqueEnable) {
+    addrTorqueEnable_ = addrTorqueEnable;
+}
+
+uint16_t Motor::getAddrTorqueEnable() const {
+    return addrTorqueEnable_;
 }
 
 /**
@@ -122,7 +184,7 @@ dynamixel::PacketHandler* Motor::getPacketHandler() const {
  * @param position The target position to set.
  */
 void Motor::setTargetPosition(uint8_t id, float position) {
-    write2OnAddress(id, 30, position);
+    write2OnAddress(id, getAddrTargetPosition(), position);
 }
 
 /**
@@ -132,7 +194,7 @@ void Motor::setTargetPosition(uint8_t id, float position) {
  * @return The present position of the motor.
  */
 uint16_t Motor::readPresentPosition(uint8_t id) {
-    return read2FromAddress(id, 30);
+    return read2FromAddress(id, getAddrPresentPosition());
 }
 
 /**
@@ -209,4 +271,34 @@ uint16_t Motor::read2FromAddress(uint8_t id, uint16_t address) {
         std::cout << "Success to read from address: " << address << " for [ID:" << (unsigned int)id << "]" << std::endl;
     }
     return data;
+}
+
+
+
+
+bool Motor::enableTorque() {
+  uint8_t dxl_error = 0;
+  int dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, getId(), getAddrTorqueEnable(), 1, &dxl_error);
+  if (dxl_comm_result != COMM_SUCCESS || dxl_error != 0) {
+        std::cerr << "Failed to enable torque for motor ID: " << getId() << std::endl;
+        return false;
+    }
+    else {
+        std::cerr << "Torque enable for motor ID: " << getId() << std::endl;
+    }
+    return true;
+}
+
+
+bool Motor::disableTorque() {
+    uint8_t dxl_error = 0;
+    int dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, getId(), getAddrTorqueEnable(), 0, &dxl_error);
+    if (dxl_comm_result != COMM_SUCCESS || dxl_error != 0) {
+        std::cerr << "Failed to disable torque for motor ID: " << getId() << std::endl;
+        return false;
+    }
+    else {
+        std::cerr << "Torque disabled for motor ID: " << getId() << std::endl;
+    }
+    return true;
 }

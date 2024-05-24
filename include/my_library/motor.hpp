@@ -13,7 +13,16 @@ private:
     std::string serial_port_; ///< Serial port to which the motor is connected.
     int baudrate_; ///< Baudrate for the serial communication.
     float protocol_version_; ///< Protocol version used for communication.
+
+    uint16_t addrTargetPosition_; ///< Address for Target Position in RH8D's control table.      
+    uint16_t addrPresentPosition_; ///< Address for Present Position in RH8D's control table.
+
+    uint16_t addrTorqueEnable_; ///< Address for Torque Enable in RH8D's control table.
     
+    uint16_t lenAddrTargetPosition_; ///< Size of address for Target Position in RH8D's control table.      
+    uint16_t lenAddrPresentPosition_; ///< Size of Address for Present Position in RH8D's control table.
+
+
     dynamixel::PortHandler *portHandler_; ///< Pointer to the port handler.
     dynamixel::PacketHandler *packetHandler_; ///< Pointer to the packet handler.
 
@@ -65,32 +74,69 @@ public:
     int getId();
 
     /**
-     * @brief Sets the packet handler.
+     * @brief Sets the address for the target position.
      * 
-     * @param packetHandler Pointer to the packet handler.
+     * @param addrTargetPosition The address to be set for the target position.
      */
-    void setPacketHandler(dynamixel::PacketHandler *packetHandler);
+    void setAddrTargetPosition(uint16_t addrTargetPosition);
 
     /**
-     * @brief Sets the port handler.
+     * @brief Gets the address for the target position.
      * 
-     * @param portHandler Pointer to the port handler.
+     * @return The address for the target position.
      */
-    void setPortHandler(dynamixel::PortHandler *portHandler);
+    uint16_t getAddrTargetPosition() const;
 
     /**
-     * @brief Gets the port handler.
+     * @brief Sets the address for the present position.
      * 
-     * @return Pointer to the port handler.
+     * @param addrPresentPosition The address to be set for the present position.
      */
-    dynamixel::PortHandler* getPortHandler() const;
+    void setAddrPresentPosition(uint16_t addrPresentPosition);
 
     /**
-     * @brief Gets the packet handler.
+     * @brief Gets the address for the present position.
      * 
-     * @return Pointer to the packet handler.
+     * @return The address for the present position.
      */
-    dynamixel::PacketHandler* getPacketHandler() const;
+    uint16_t getAddrPresentPosition() const;
+
+    /**
+    * @brief Sets the size (nr of bytes to write) for address of the target position.
+    * 
+    * @param lenAddrTargetPosition The size to be set for length of address for target position.
+    */
+    void setLenAddrTargetPosition(uint16_t lenAddrTargetPosition);
+
+    /**
+    * @brief Gets the size (nr of bytes to write) for address of the target position.
+    * 
+    * @return  The size to be set for length of address for target position.
+    */
+    uint16_t getLenAddrTargetPosition() const;
+
+    /**
+    * @brief Sets the size (nr of bytes to write) for address of the present position.
+    * 
+    * @param lenAddrPresentPosition The size to be set for length of address for present position.
+    */
+    void setLenAddrPresentPosition(uint16_t lenAddrPresentPosition);
+
+
+    /**
+    * @brief Gets the size (nr of bytes to write) for address of the present position.
+    * 
+    * @return  The size to be set for length of address for present position.
+    */
+    uint16_t getLenAddrPresentPosition() const;
+
+
+
+    void setAddrTorqueEnable(uint16_t addrTorqueEnable);
+
+
+
+    uint16_t getAddrTorqueEnable() const;
 
     /**
      * @brief Sets the target position of the motor.
@@ -143,6 +189,11 @@ public:
      * @return Read data.
      */
     uint16_t read2FromAddress(uint8_t id, uint16_t address);
+
+
+    bool enableTorque();
+    bool disableTorque();
 };
+
 
 #endif // MOTOR_H
