@@ -146,10 +146,10 @@ void Motor::write1OnAddress(uint8_t id, uint16_t address, uint8_t data) {
     uint8_t dxl_error = 0;
     int dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, id, address, data, &dxl_error);
     if (dxl_comm_result != COMM_SUCCESS || dxl_error != 0) {
-        std::cerr << "Failed to write input: " << data << " with address: " << address << " for [ID:" << id << "]" << std::endl;
+        std::cerr << "Failed to write input: " << data << " with address: " << address << " for [ID:" << (unsigned int)id << "]" << std::endl;
     }
     else {
-        std::cout << "Success to write input: " << data << " with address: " << address << " for [ID:" << id << "]" << std::endl;
+        std::cout << "Success to write input: " << data << " with address: " << address << " for [ID:" << (unsigned int)id << "]" << std::endl;
     }
 }
 
@@ -164,10 +164,10 @@ void Motor::write2OnAddress(uint8_t id, uint16_t address, uint16_t data) {
     uint8_t dxl_error = 0;
     int dxl_comm_result = packetHandler_->write2ByteTxRx(portHandler_, id, address, data, &dxl_error);
     if (dxl_comm_result != COMM_SUCCESS || dxl_error != 0) {
-        std::cerr << "Failed to write input: " << data << " with address: " << address << " for [ID:" << id << "]" << std::endl;
+        std::cerr << "Failed to write input: " << data << " with address: " << address << " for [ID:" << (unsigned int)id << "]" << std::endl;
     }
     else {
-        std::cout << "Success to write input: " << data << " with address: " << address << " for [ID:" << id << "]" << std::endl;
+        std::cout << "Success to write input: " << data << " with address: " << address << " for [ID:" << (unsigned int)id << "]" << std::endl;
     }
 }
 
@@ -183,10 +183,10 @@ uint8_t Motor::read1FromAddress(uint8_t id, uint16_t address) {
     uint8_t dxl_error;
     int dxl_comm_result = packetHandler_->read1ByteTxRx(portHandler_, id, address, &data, &dxl_error);
     if (dxl_comm_result != COMM_SUCCESS) {
-        std::cerr << "Failed to read from address: " << address << " for [ID:" << id << "]" << std::endl;
+        std::cerr << "Failed to read from address: " << address << " for [ID:" << (unsigned int)id << "]" << std::endl;
     }
     else {
-        std::cout << "Success to read from address: " << address << " for [ID:" << id << "]" << std::endl;
+        std::cout << "Success to read from address: " << address << " for [ID:" << (unsigned int)id << "]" << std::endl;
     }
     return data;
 }
@@ -203,10 +203,10 @@ uint16_t Motor::read2FromAddress(uint8_t id, uint16_t address) {
     uint8_t dxl_error;
     int dxl_comm_result = packetHandler_->read2ByteTxRx(portHandler_, id, address, &data, &dxl_error);
     if (dxl_comm_result != COMM_SUCCESS) {
-        std::cerr << "Failed to read from address: " << address << " for [ID:" << id << "]" << std::endl;
+        std::cerr << "Failed to read from address: " << address << " for [ID:" << (unsigned int)id << "]" << std::endl;
     }
     else {
-        std::cout << "Success to read from address: " << address << " for [ID:" << id << "]" << std::endl;
+        std::cout << "Success to read from address: " << address << " for [ID:" << (unsigned int)id << "]" << std::endl;
     }
     return data;
 }

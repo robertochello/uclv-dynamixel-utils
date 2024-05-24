@@ -1,6 +1,7 @@
 #include "dynamixel_sdk/dynamixel_sdk.h"
 #include <memory>
 #include "my_library/hand.hpp"
+#include <thread>
 
 /**
  * @brief Constructs a Hand object with the specified parameters.
@@ -248,14 +249,14 @@ const std::vector<std::shared_ptr<FingerMotor>>& Hand::addFingerMotor(uint8_t id
     for (const auto& motor : fingerMotors_) {
         if (motor->getId() == id) {
             // If a motor with the specified ID is found, print a message and return the current list
-            std::cout << "FingerMotor with ID " << id << " already exists in the list." << std::endl;
+            std::cout << "FingerMotor with ID " << (unsigned int)id << " already exists in the list." << std::endl;
             return fingerMotors_;
         }
     }
     
     // If no motor with the specified ID is found, create a new FingerMotor and add it to the list
     fingerMotors_.push_back(createFingerMotor(id));
-    std::cout << "FingerMotor with ID " << id << " created." << std::endl;
+    std::cout << "FingerMotor with ID " << (unsigned int)id << " created." << std::endl;
     return fingerMotors_;
 }
 
@@ -273,13 +274,11 @@ const std::vector<std::shared_ptr<WristMotor>>& Hand::addWristMotor(uint8_t id) 
     for (const auto& motor : wristMotors_) {
         if (motor->getId() == id) {
             // If a motor with the specified ID is found, print a message and return the current list
-            std::cout << "WristMotor with ID " << id << " already exists in the list." << std::endl;
+            std::cout << "WristMotor with ID " << (unsigned int)id << " already exists in the list." << std::endl;
             return wristMotors_;
         }
     }
 }
-
-
 
 
 
@@ -340,7 +339,7 @@ void Hand::removeFingerMotor(uint8_t id) {
             // Erase the motor from the list and adjust the iterator
             i = fingerMotors_.erase(i);
             --i;  // Adjust iterator to prevent skipping elements
-            std::cout << "ID: " << id << " removed." << std::endl;
+            std::cout << "ID: " << (unsigned int)id << " removed." << std::endl;
         }
     }
 }
@@ -362,7 +361,7 @@ void Hand::removeWristMotor(uint8_t id) {
             // Erase the motor from the list and adjust the iterator
             i = wristMotors_.erase(i);
             --i;  // Adjust iterator to prevent skipping elements
-            std::cout << "ID: " << id << " removed." << std::endl;
+            std::cout << "ID: " << (unsigned int)id << " removed." << std::endl;
         }
     }
 }
@@ -395,7 +394,6 @@ void Hand::removeWristMotor(uint8_t id) {
 void Hand::moveFingerMotor(const uint8_t& id, const float& position) {
     // Get the ID of the motor from the list of finger motors
     uint8_t id_motor = fingerMotors_[id]->getId();
-    
     // Set the target position for the specified motor
     fingerMotors_[id]->setTargetPosition(id_motor, position);
 }
@@ -479,7 +477,7 @@ float Hand::readWristPositionMotor(const uint8_t& id) {
  * @param ids A vector of motor IDs to be moved.
  * @param positions A vector of target positions corresponding to each motor ID. Values should be in the range 0 to 4095.
  */
-void Hand::moveMotors(const std::vector<uint16_t>& ids, const std::vector<uint32_t>& positions) {
+void Hand::moveMotors(const std::vector<uint16_t>& ids, const std::vector<float>& positions) {
     // Check if groupBulkWrite_ is initialized, if not, initialize it
     if (!groupBulkWrite_) {
         groupBulkWrite_ = std::make_unique<dynamixel::GroupBulkWrite>(portHandler_, packetHandler_);
@@ -503,7 +501,9 @@ void Hand::moveMotors(const std::vector<uint16_t>& ids, const std::vector<uint32
         // Search for the motor in fingerMotors_
         for (const auto& motor : fingerMotors_) {
             if (motor->getId() == motor_id) {
-                groupBulkWrite_->addParam(motor_id, 30, 2, param_target_position);
+                if(!groupBulkWrite_->addParam(motor_id, 30, 2, param_target_position)) { // ADDPARAM POTREBBE ESSERE DEL MOTORE OPPURE METTERE GET_ADDRESSPOSITION INVECE DI 30
+                    std::cerr << "Error during groupBulkWrite.addParam()\n";
+                }
                 motor_found = true;
                 break;
             }
@@ -528,9 +528,12 @@ void Hand::moveMotors(const std::vector<uint16_t>& ids, const std::vector<uint32
     }
 
     // Transmit the bulk write packet
-    if (groupBulkWrite_->txPacket() != COMM_SUCCESS) {
-        std::cerr << "Error: Failed to transmit bulk write packet." << std::endl;
+    int result = groupBulkWrite_->txPacket();
+    std::this_thread::sleep_for(std::chrono::microseconds(500));
+    if (result != COMM_SUCCESS) {
+        std::cerr << "Error: Failed to transmit bulk write packet. Result: " << result << std::endl;
     }
+    groupBulkWrite_->clearParam();
 }
 
 

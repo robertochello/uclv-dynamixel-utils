@@ -5,8 +5,12 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <cmath>
 
 #include "dynamixel_sdk/dynamixel_sdk.h"
+
+#include "colors.hpp"
+
 #include "motor.hpp"
 #include "fingermotor.hpp"
 #include "wristmotor.hpp"
@@ -285,7 +289,7 @@ public:
      * @param ids A vector of motor identifiers.
      * @param positions A vector of target positions.
      */
-    void moveMotors(const std::vector<uint16_t>& ids, const std::vector<uint32_t>& positions);
+    void moveMotors(const std::vector<uint16_t>& ids, const std::vector<float>& positions);
 
     /**
      * @brief Reads the positions of multiple motors using bulk read.
