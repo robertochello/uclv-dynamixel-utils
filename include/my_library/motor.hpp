@@ -190,8 +190,22 @@ public:
      */
     uint16_t read2FromAddress(uint8_t id, uint16_t address);
 
-
+    /**
+     * @brief Enables torque for the motor.
+     * 
+     * This method enables torque for the motor by writing a value of 1 to the torque enable address.
+     * 
+     * @return True if torque is successfully enabled, false otherwise.
+     */
     bool enableTorque();
+
+    /**
+     * @brief Disables torque for the motor.
+     * 
+     * This method disables torque for the motor by writing a value of 0 to the torque enable address.
+     * 
+     * @return True if torque is successfully disabled, false otherwise.
+     */
     bool disableTorque();
 };
 
