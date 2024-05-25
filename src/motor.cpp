@@ -276,20 +276,33 @@ uint16_t Motor::read2FromAddress(uint8_t id, uint16_t address) {
 
 
 
+/**
+ * @brief Enables torque for the motor.
+ * 
+ * This method enables torque for the motor by writing a value of 1 to the torque enable address.
+ * 
+ * @return True if torque is successfully enabled, false otherwise.
+ */
 bool Motor::enableTorque() {
-  uint8_t dxl_error = 0;
-  int dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, getId(), getAddrTorqueEnable(), 1, &dxl_error);
-  if (dxl_comm_result != COMM_SUCCESS || dxl_error != 0) {
+    uint8_t dxl_error = 0;
+    int dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, getId(), getAddrTorqueEnable(), 1, &dxl_error);
+    if (dxl_comm_result != COMM_SUCCESS || dxl_error != 0) {
         std::cerr << "Failed to enable torque for motor ID: " << getId() << std::endl;
         return false;
     }
     else {
-        std::cerr << "Torque enable for motor ID: " << getId() << std::endl;
+        std::cout << "Torque enabled for motor ID: " << getId() << std::endl;
     }
     return true;
 }
 
-
+/**
+ * @brief Disables torque for the motor.
+ * 
+ * This method disables torque for the motor by writing a value of 0 to the torque enable address.
+ * 
+ * @return True if torque is successfully disabled, false otherwise.
+ */
 bool Motor::disableTorque() {
     uint8_t dxl_error = 0;
     int dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, getId(), getAddrTorqueEnable(), 0, &dxl_error);
@@ -298,7 +311,7 @@ bool Motor::disableTorque() {
         return false;
     }
     else {
-        std::cerr << "Torque disabled for motor ID: " << getId() << std::endl;
+        std::cout << "Torque disabled for motor ID: " << getId() << std::endl;
     }
     return true;
 }
