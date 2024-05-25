@@ -273,9 +273,6 @@ uint16_t Motor::read2FromAddress(uint8_t id, uint16_t address) {
     return data;
 }
 
-
-
-
 /**
  * @brief Enables torque for the motor.
  * 
