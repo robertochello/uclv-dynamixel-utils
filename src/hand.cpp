@@ -511,7 +511,6 @@ void Hand::moveMotors(const std::vector<uint16_t>& ids, const std::vector<float>
         param_target_position[0] = DXL_LOBYTE(DXL_LOWORD(positions[i]));
         param_target_position[1] = DXL_HIBYTE(DXL_LOWORD(positions[i]));
         uint16_t motor_id = ids[i];
-
         bool motor_found = false;
         // Search for the motor in fingerMotors_
         for (const auto& motor : fingerMotors_) {
@@ -581,7 +580,7 @@ std::vector<uint32_t> Hand::readMotorsPositions(const std::vector<uint16_t>& ids
         // Search for the motor in fingerMotors_
         for (const auto& motor : fingerMotors_) {
             if (motor->getId() == motor_id) {
-                if (!groupBulkRead_->addParam(motor_id, 30, 2)) {
+                if (!groupBulkRead_->addParam(motor_id, motor->getAddrPresentPosition(), motor->getLenAddrPresentPosition())) {
                     std::cerr << "Failed to add FingerMotor ID " << motor_id << " to bulk read." << std::endl;
                 }
                 motor_found = true;
@@ -593,7 +592,7 @@ std::vector<uint32_t> Hand::readMotorsPositions(const std::vector<uint16_t>& ids
         if (!motor_found) {
             for (const auto& motor : wristMotors_) {
                 if (motor->getId() == motor_id) {
-                    if (!groupBulkRead_->addParam(motor_id, 30, 2)) {
+                    if (!groupBulkRead_->addParam(motor_id, motor->getAddrPresentPosition(), motor->getLenAddrPresentPosition())) {
                         std::cerr << "Failed to add WristMotor ID " << motor_id << " to bulk read." << std::endl;
                     }
                     motor_found = true;
