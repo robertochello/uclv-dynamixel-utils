@@ -183,8 +183,8 @@ uint16_t Motor::getAddrTorqueEnable() const {
  * @param id The identifier of the motor.
  * @param position The target position to set.
  */
-void Motor::setTargetPosition(uint8_t id, float position) {
-    write2OnAddress(id, getAddrTargetPosition(), position);
+void Motor::setTargetPosition(float position) { /////// id
+    write2OnAddress(id_, getAddrTargetPosition(), position);
 }
 
 /**
@@ -193,8 +193,8 @@ void Motor::setTargetPosition(uint8_t id, float position) {
  * @param id The identifier of the motor.
  * @return The present position of the motor.
  */
-uint16_t Motor::readPresentPosition(uint8_t id) {
-    return read2FromAddress(id, getAddrPresentPosition());
+uint16_t Motor::readPresentPosition() {
+    return read2FromAddress(id_, getAddrPresentPosition());
 }
 
 /**

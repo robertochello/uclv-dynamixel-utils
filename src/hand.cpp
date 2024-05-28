@@ -399,7 +399,7 @@ void Hand::moveFingerMotor(const uint8_t& id, const float& position) {
     for (const auto& motor : fingerMotors_) {
         if (motor->getId() == id) {
             // Set the target position for the found motor
-            motor->setTargetPosition(id, position);
+            motor->setTargetPosition(position);
             return;
         }
     }
@@ -422,7 +422,7 @@ void Hand::moveWristMotor(const uint8_t& id, const float& position) {
     for (const auto& motor : wristMotors_) {
         if (motor->getId() == id) {
             // Set the target position for the found motor
-            motor->setTargetPosition(id, position);
+            motor->setTargetPosition(position);
             return;
         }
     }
@@ -451,7 +451,7 @@ float Hand::readFingerPositionMotor(const uint8_t& id) {
     uint8_t id_motor = fingerMotors_[id]->getId();
     
     // Read the current position of the specified motor
-    uint16_t position = fingerMotors_[id]->readPresentPosition(id_motor);
+    uint16_t position = fingerMotors_[id]->readPresentPosition();
     
     // Return the current position
     return position;
@@ -471,7 +471,7 @@ float Hand::readWristPositionMotor(const uint8_t& id) {
     uint8_t id_motor = wristMotors_[id]->getId();
     
     // Read the current position of the specified motor
-    uint32_t position = wristMotors_[id]->readPresentPosition(id_motor);
+    uint32_t position = wristMotors_[id]->readPresentPosition();
     
     // Return the current position
     return position;

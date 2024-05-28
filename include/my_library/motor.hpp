@@ -14,7 +14,7 @@ private:
     int baudrate_; ///< Baudrate for the serial communication.
     float protocol_version_; ///< Protocol version used for communication.
 
-    uint16_t addrTargetPosition_; ///< Address for Target Position in RH8D's control table.      
+    uint16_t addrTargetPosition_; ///< Address for Target Position in RH8D's control table.      ///// valore qui
     uint16_t addrPresentPosition_; ///< Address for Present Position in RH8D's control table.
 
     uint16_t addrTorqueEnable_; ///< Address for Torque Enable in RH8D's control table.
@@ -141,18 +141,16 @@ public:
     /**
      * @brief Sets the target position of the motor.
      * 
-     * @param id Identifier of the motor.
      * @param position Target position.
      */
-    void setTargetPosition(uint8_t id, float position);
+    void setTargetPosition(float position);
 
     /**
      * @brief Reads the present position of the motor.
      * 
-     * @param id Identifier of the motor.
      * @return Present position of the motor.
      */
-    uint16_t readPresentPosition(uint8_t id);
+    uint16_t readPresentPosition();
 
     /**
      * @brief Writes a byte to the specified address of the motor.
