@@ -503,7 +503,6 @@ void Hand::moveMotors(const std::vector<uint16_t>& ids, const std::vector<float>
         std::cerr << "Error: Mismatched IDs and positions sizes." << std::endl;
         return;
     }
-
     // Prepare parameters for bulk write
     uint8_t param_target_position[2];
     for (size_t i = 0; i < ids.size(); i++) {
@@ -512,6 +511,7 @@ void Hand::moveMotors(const std::vector<uint16_t>& ids, const std::vector<float>
         param_target_position[1] = DXL_HIBYTE(DXL_LOWORD(positions[i]));
         uint16_t motor_id = ids[i];
         bool motor_found = false;
+
         // Search for the motor in fingerMotors_
         for (const auto& motor : fingerMotors_) {
             if (motor->getId() == motor_id) {
