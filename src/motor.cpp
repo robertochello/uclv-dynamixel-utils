@@ -22,12 +22,7 @@ Motor::Motor(const std::string& serial_port, int baudrate, float protocol_versio
     protocol_version_(protocol_version),
     portHandler_(portHandler),
     packetHandler_(packetHandler),
-    id_(id),
-    addrTargetPosition_(30),
-    addrPresentPosition_(36),
-    addrTorqueEnable_(24),
-    lenAddrTargetPosition_(2),
-    lenAddrPresentPosition_(2) {}
+    id_(id) {}
 
 /**
  * @brief Constructor of the Motor class.
@@ -46,12 +41,7 @@ Motor::Motor(const std::string& serial_port, int baudrate, float protocol_versio
     serial_port_(serial_port),
     baudrate_(baudrate),
     protocol_version_(protocol_version),
-    id_(id),
-    addrTargetPosition_(30),
-    addrPresentPosition_(36),
-    addrTorqueEnable_(24),
-    lenAddrTargetPosition_(2),
-    lenAddrPresentPosition_(2)
+    id_(id)
     {
         portHandler_ = dynamixel::PortHandler::getPortHandler(serial_port.c_str());
         packetHandler_ = dynamixel::PacketHandler::getPacketHandler(protocol_version);
@@ -69,12 +59,7 @@ Motor::Motor()
     protocol_version_(0),
     id_(0),
     portHandler_(nullptr),
-    packetHandler_(nullptr),
-    addrTargetPosition_(30),
-    addrPresentPosition_(36),
-    addrTorqueEnable_(24),
-    lenAddrTargetPosition_(2),
-    lenAddrPresentPosition_(2) {}
+    packetHandler_(nullptr) {}
 
 /**
  * @brief Sets the ID of the motor.
@@ -183,7 +168,7 @@ uint16_t Motor::getAddrTorqueEnable() const {
  * @param id The identifier of the motor.
  * @param position The target position to set.
  */
-void Motor::setTargetPosition(float position) { /////// id
+void Motor::setTargetPosition(float position) {
     write2OnAddress(id_, getAddrTargetPosition(), position);
 }
 
@@ -284,11 +269,11 @@ bool Motor::enableTorque() {
     uint8_t dxl_error = 0;
     int dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, getId(), getAddrTorqueEnable(), 1, &dxl_error);
     if (dxl_comm_result != COMM_SUCCESS || dxl_error != 0) {
-        std::cerr << "Failed to enable torque for motor ID: " << getId() << std::endl;
+        std::cerr << ERROR_COLOR <<"Failed" << CRESET <<" to enable torque for motor ID: " << getId() << std::endl;
         return false;
     }
     else {
-        std::cout << "Torque enabled for motor ID: " << getId() << std::endl;
+        std::cout << "Torque "<< SUCCESS_COLOR <<"enabled" << CRESET << " for motor ID: " << getId() << std::endl;
     }
     return true;
 }
@@ -304,11 +289,11 @@ bool Motor::disableTorque() {
     uint8_t dxl_error = 0;
     int dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, getId(), getAddrTorqueEnable(), 0, &dxl_error);
     if (dxl_comm_result != COMM_SUCCESS || dxl_error != 0) {
-        std::cerr << "Failed to disable torque for motor ID: " << getId() << std::endl;
+        std::cerr << ERROR_COLOR <<"Failed" << CRESET <<" to disable torque for motor ID: " << getId() << std::endl;
         return false;
     }
     else {
-        std::cout << "Torque disabled for motor ID: " << getId() << std::endl;
+        std::cout << "Torque "<< SUCCESS_COLOR <<"disable" << CRESET << " for motor ID: " << getId() << std::endl;
     }
     return true;
 }

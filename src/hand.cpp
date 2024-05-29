@@ -31,9 +31,9 @@ Hand::Hand(const std::string& serial_port, int baudrate, float protocol_version)
     : serial_port_(serial_port),
       baudrate_(baudrate),
       protocol_version_(protocol_version) {
-    portHandler_ = dynamixel::PortHandler::getPortHandler(serial_port.c_str());
-    packetHandler_ = dynamixel::PacketHandler::getPacketHandler(protocol_version);
-}
+        portHandler_ = dynamixel::PortHandler::getPortHandler(serial_port.c_str());
+        packetHandler_ = dynamixel::PacketHandler::getPacketHandler(protocol_version);
+    }
 
 /**
  * @brief Default constructor for Hand.
@@ -56,18 +56,25 @@ Hand::~Hand() {
 /**
  * @brief Initializes the serial port and sets the baudrate.
  */
-void Hand::initialize() {
+bool Hand::initialize() {
     if (portHandler_ == nullptr || packetHandler_ == nullptr) {
-        std::cerr << "ERROR: portHandler or packetHandler not initialized properly." << std::endl;
-        return;
+        std::cout << ERROR_COLOR "ERROR:"<< CRESET <<" portHandler or packetHandler not initialized properly." << std::endl;
+        return false;
     }
     if (!portHandler_->openPort()) {
-        std::cerr << "ERROR: serial port not opened." << std::endl;
+        std::cout << ERROR_COLOR "ERROR:"<< CRESET <<" serial port not opened." << std::endl;
+        return false;
     }
     if (!portHandler_->setBaudRate(baudrate_)) {
-        std::cerr << "ERROR: baudrate not set." << std::endl;
+        std::cerr << ERROR_COLOR "ERROR:"<< CRESET <<" baudrate not set." << std::endl;
+        return false;
     }
-    std::cout << "Connection initialized successfully." << std::endl;
+    if (portHandler_ && packetHandler_) {
+        std::cout << "Connection initialized " << SUCCESS_COLOR <<"successfully"<< CRESET <<"." << std::endl;
+        return true;
+    } else {
+        return false;
+    }
 }
 
 /**
@@ -151,8 +158,8 @@ void Hand::setSerialPortLowLatency(const std::string& serial_port) {
     std::cout << "Setting low latency for " << WARN_COLOR << serial_port << CRESET << std::endl;
     std::string command = "setserial " + serial_port + " low_latency";
     int result = system(command.c_str());
-    std::cout << "Setting low latency for " << WARN_COLOR << serial_port << CRESET 
-              << " result: " << WARN_COLOR << result << CRESET << std::endl;
+    std::cout << "Setted low latency for " << WARN_COLOR << serial_port << CRESET 
+              << " result: " << SUCCESS_COLOR << result << CRESET << std::endl;
 }
 
 /**
@@ -297,9 +304,9 @@ void Hand::printFingerMotors() const {
         return;
     } else {
         std::cout << "Finger Motors:" << std::endl;
-        // Iterate over the list of finger motors and print their index and ID
+        // Iterate over the list of finger motors and print their ID
         for (size_t i = 0; i < fingerMotors_.size(); i++) {
-            std::cout << "Index: " << i << " - ID: " << fingerMotors_[i]->getId() << std::endl;
+            std::cout << "ID: " << fingerMotors_[i]->getId() << std::endl;
         }
     }
 }
@@ -318,9 +325,9 @@ void Hand::printWristMotors() const {
         return;
     } else {
         std::cout << "Wrist Motors:" << std::endl;
-        // Iterate over the list of wrist motors and print their index and ID
+        // Iterate over the list of wrist motors and print their ID
         for (size_t i = 0; i < wristMotors_.size(); i++) {
-            std::cout << "Index: " << i << " - ID: " << wristMotors_[i]->getId() << std::endl;
+            std::cout << "ID: " << wristMotors_[i]->getId() << std::endl;
         }
     }
 }
@@ -492,7 +499,7 @@ float Hand::readWristPositionMotor(const uint8_t& id) {
  * @param ids A vector of motor IDs to be moved.
  * @param positions A vector of target positions corresponding to each motor ID. Values should be in the range 0 to 4095.
  */
-void Hand::moveMotors(const std::vector<uint16_t>& ids, const std::vector<float>& positions) {
+void Hand::moveMotors(const std::vector<uint8_t>& ids, const std::vector<float>& positions) {
     // Check if groupBulkWrite_ is initialized, if not, initialize it
     if (!groupBulkWrite_) {
         groupBulkWrite_ = std::make_unique<dynamixel::GroupBulkWrite>(portHandler_, packetHandler_);
@@ -509,7 +516,7 @@ void Hand::moveMotors(const std::vector<uint16_t>& ids, const std::vector<float>
         // Convert the position to low and high bytes
         param_target_position[0] = DXL_LOBYTE(DXL_LOWORD(positions[i]));
         param_target_position[1] = DXL_HIBYTE(DXL_LOWORD(positions[i]));
-        uint16_t motor_id = ids[i];
+        uint8_t motor_id = ids[i];
         bool motor_found = false;
 
         // Search for the motor in fingerMotors_
@@ -541,11 +548,23 @@ void Hand::moveMotors(const std::vector<uint16_t>& ids, const std::vector<float>
 
     // Transmit the bulk write packet
     int result = groupBulkWrite_->txPacket();
-    std::this_thread::sleep_for(std::chrono::microseconds(500));
+    // std::this_thread::sleep_for(std::chrono::microseconds(500));
     if (result != COMM_SUCCESS) {
         std::cerr << "Error: Failed to transmit bulk write packet. Result: " << result << std::endl;
     }
+
+    // for (const auto& motor : fingerMotors_) {
+    // std::cout << "ff\n";
+    //     motor->disableTorque();
+    // }
+
     groupBulkWrite_->clearParam();
+    std::this_thread::sleep_for(std::chrono::microseconds(500));
+
+
+
+
+    
 }
 
 
@@ -574,7 +593,7 @@ std::vector<uint32_t> Hand::readMotorsPositions(const std::vector<uint16_t>& ids
 
     // Add motors to bulk read
     for (size_t i = 0; i < ids.size(); i++) {
-        uint16_t motor_id = ids[i];
+        uint8_t motor_id = ids[i];
         bool motor_found = false;
 
         // Search for the motor in fingerMotors_
@@ -616,7 +635,7 @@ std::vector<uint32_t> Hand::readMotorsPositions(const std::vector<uint16_t>& ids
 
     // Retrieve the positions from the bulk read packet
     for (size_t i = 0; i < ids.size(); i++) {
-        uint16_t motor_id = ids[i];
+        uint8_t motor_id = ids[i];
         bool motor_found = false;
 
         // Search for the motor in fingerMotors_

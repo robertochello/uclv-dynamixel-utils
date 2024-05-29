@@ -2,6 +2,9 @@
 #define MOTOR_H
 
 #include "dynamixel_sdk/dynamixel_sdk.h"
+
+#include "colors.hpp"
+
 #include <string>
 
 /**
@@ -14,13 +17,13 @@ private:
     int baudrate_; ///< Baudrate for the serial communication.
     float protocol_version_; ///< Protocol version used for communication.
 
-    uint16_t addrTargetPosition_; ///< Address for Target Position in RH8D's control table.      ///// valore qui
-    uint16_t addrPresentPosition_; ///< Address for Present Position in RH8D's control table.
+    uint16_t addrTargetPosition_ = 30; ///< Address for Target Position in RH8D's control table.
+    uint16_t addrPresentPosition_ = 36; ///< Address for Present Position in RH8D's control table.
 
-    uint16_t addrTorqueEnable_; ///< Address for Torque Enable in RH8D's control table.
+    uint16_t addrTorqueEnable_= 24; ///< Address for Torque Enable in RH8D's control table.
     
-    uint16_t lenAddrTargetPosition_; ///< Size of address for Target Position in RH8D's control table.      
-    uint16_t lenAddrPresentPosition_; ///< Size of Address for Present Position in RH8D's control table.
+    uint16_t lenAddrTargetPosition_ = 2; ///< Size of address for Target Position in RH8D's control table.      
+    uint16_t lenAddrPresentPosition_ = 2; ///< Size of Address for Present Position in RH8D's control table.
 
 
     dynamixel::PortHandler *portHandler_; ///< Pointer to the port handler.

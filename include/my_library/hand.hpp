@@ -70,7 +70,7 @@ public:
     /**
      * @brief Initializes the hand.
      */
-    void initialize();
+    bool initialize();
 
     /**
      * @brief Sets the serial port.
@@ -199,19 +199,6 @@ public:
      */
     const std::vector<std::shared_ptr<WristMotor>>& addWristMotor(uint8_t id);
 
-    /**
-     * @brief Adds a motor to the hand.
-     * 
-     * @param fingerMotor A shared pointer to the finger motor.
-     */
-    void addMotor(std::shared_ptr<FingerMotor>& fingerMotor);
-
-    /**
-     * @brief Adds a motor to the hand.
-     * 
-     * @param wristMotor A shared pointer to the wrist motor.
-     */
-    void addMotor(std::shared_ptr<WristMotor>& wristMotor);
 
     /**
      * @brief Gets the finger motors.
@@ -289,7 +276,7 @@ public:
      * @param ids A vector of motor identifiers.
      * @param positions A vector of target positions.
      */
-    void moveMotors(const std::vector<uint16_t>& ids, const std::vector<float>& positions);
+    void moveMotors(const std::vector<uint8_t>& ids, const std::vector<float>& positions);
 
     /**
      * @brief Reads the positions of multiple motors using bulk read.
