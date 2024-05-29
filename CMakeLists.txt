@@ -35,11 +35,8 @@ add_library(my_library
 ament_target_dependencies(my_library
     "dynamixel_sdk"
 )
-
-
 ament_export_targets(my_libraryTargets HAS_LIBRARY_TARGET)
 ament_export_dependencies(dynamixel_sdk)
-# ament_export_include_directories(include)
 
 install(
   TARGETS my_library
@@ -49,14 +46,9 @@ install(
   RUNTIME DESTINATION bin
   INCLUDES DESTINATION include
 )
-
 install(
   DIRECTORY include/
   DESTINATION include
 )
-
-
-
-
 
 ament_package()
