@@ -541,7 +541,7 @@ void Hand::moveMotors(const std::vector<uint8_t>& ids, const std::vector<float>&
 
         // If motor ID is not found in both lists, print an error and return
         if (!motor_found) {
-            std::cerr << "Error: Motor ID " << motor_id << " not found." << std::endl;
+            std::cerr << "Error: Motor ID " << (unsigned int)motor_id << " not found." << std::endl;
             return;
         }
     }
