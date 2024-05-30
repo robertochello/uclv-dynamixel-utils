@@ -552,19 +552,8 @@ void Hand::moveMotors(const std::vector<uint8_t>& ids, const std::vector<float>&
     if (result != COMM_SUCCESS) {
         std::cerr << "Error: Failed to transmit bulk write packet. Result: " << result << std::endl;
     }
-
-    // for (const auto& motor : fingerMotors_) {
-    // std::cout << "ff\n";
-    //     motor->disableTorque();
-    // }
-
     groupBulkWrite_->clearParam();
     std::this_thread::sleep_for(std::chrono::microseconds(500));
-
-
-
-
-    
 }
 
 
