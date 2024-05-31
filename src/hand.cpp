@@ -163,48 +163,6 @@ void Hand::setSerialPortLowLatency(const std::string& serial_port) {
 }
 
 /**
- * @brief Converts radians to degrees.
- * 
- * @param radians The angle in radians.
- * @return The angle in degrees.
- */
-float Hand::rad_to_degrees(float radians) {
-    return radians * (180.0 / M_PI);
-}
-
-/**
- * @brief Converts degrees to motor position.
- * 
- * @param degrees The angle in degrees.
- * @return The motor position.
- */
-uint16_t Hand::degrees_to_position(float degrees) {
-    const double conversion_factor = 0.088;
-    return degrees / conversion_factor;
-}
-
-/**
- * @brief Converts degrees to radians.
- * 
- * @param degrees The angle in degrees.
- * @return The angle in radians.
- */
-float Hand::degrees_to_rad(float degrees) {
-    return degrees * (M_PI / 180.0);
-}
-
-/**
- * @brief Converts motor position to degrees.
- * 
- * @param position The motor position.
- * @return The angle in degrees.
- */
-float Hand::position_to_degrees(uint16_t position) {
-    const double conversion_factor = 0.088;
-    return position * conversion_factor;
-}
-
-/**
  * @brief Gets the list of finger motors.
  * 
  * @return A vector of shared pointers to the finger motors.
@@ -256,13 +214,13 @@ const std::vector<std::shared_ptr<FingerMotor>>& Hand::addFingerMotor(uint8_t id
     for (const auto& motor : fingerMotors_) {
         if (motor->getId() == id) {
             // If a motor with the specified ID is found, print a message and return the current list
-            std::cout << "FingerMotor with ID " << (unsigned int)id << " already exists in the list." << std::endl;
+            std::cout << "FingerMotor with ID " << (unsigned int)id << " already exists in the list.\n";
             return fingerMotors_;
         }
     }
     // If no motor with the specified ID is found, create a new FingerMotor and add it to the list
     fingerMotors_.push_back(createFingerMotor(id));
-    std::cout << "FingerMotor with ID " << (unsigned int)id << " created." << std::endl;
+    std::cout << "FingerMotor with ID " << (unsigned int)id << " created.\n";
     return fingerMotors_;
 }
 
@@ -280,17 +238,15 @@ const std::vector<std::shared_ptr<WristMotor>>& Hand::addWristMotor(uint8_t id) 
     for (const auto& motor : wristMotors_) {
         if (motor->getId() == id) {
             // If a motor with the specified ID is found, print a message and return the current list
-            std::cout << "WristMotor with ID " << (unsigned int)id << " already exists in the list." << std::endl;
+            std::cout << "WristMotor with ID " << (unsigned int)id << " already exists in the list.\n";
             return wristMotors_;
         }
     }
     // If no motor with the specified ID is found, create a new FingerMotor and add it to the list
     wristMotors_.push_back(createWristMotor(id));
-    std::cout << "WristMotor with ID " << (unsigned int)id << " created." << std::endl;
+    std::cout << "WristMotor with ID " << (unsigned int)id << " created.\n";
     return wristMotors_;
 }
-
-
 
 /**
  * @brief Prints the IDs of all finger motors.
@@ -300,18 +256,16 @@ const std::vector<std::shared_ptr<WristMotor>>& Hand::addWristMotor(uint8_t id) 
 void Hand::printFingerMotors() const {
     // Check if the list of finger motors is empty
     if (fingerMotors_.empty()) {
-        std::cout << "No Finger Motors found." << std::endl;
+        std::cout << "No Finger Motors found.\n";
         return;
     } else {
-        std::cout << "Finger Motors:" << std::endl;
+        std::cout << "Finger Motors:\n";
         // Iterate over the list of finger motors and print their ID
         for (size_t i = 0; i < fingerMotors_.size(); i++) {
             std::cout << "ID: " << fingerMotors_[i]->getId() << std::endl;
         }
     }
 }
-
-
 
 /**
  * @brief Prints the IDs of all wrist motors.
@@ -321,18 +275,16 @@ void Hand::printFingerMotors() const {
 void Hand::printWristMotors() const {
     // Check if the list of wrist motors is empty
     if (wristMotors_.empty()) {
-        std::cout << "No Wrist Motors found." << std::endl;
+        std::cout << "No Wrist Motors found.\n";
         return;
     } else {
-        std::cout << "Wrist Motors:" << std::endl;
+        std::cout << "Wrist Motors:\n";
         // Iterate over the list of wrist motors and print their ID
         for (size_t i = 0; i < wristMotors_.size(); i++) {
             std::cout << "ID: " << wristMotors_[i]->getId() << std::endl;
         }
     }
 }
-
-
 
 /**
  * @brief Removes a finger motor from the list by its ID.
@@ -349,12 +301,10 @@ void Hand::removeFingerMotor(uint8_t id) {
             // Erase the motor from the list and adjust the iterator
             i = fingerMotors_.erase(i);
             --i;  // Adjust iterator to prevent skipping elements
-            std::cout << "ID: " << (unsigned int)id << " removed." << std::endl;
+            std::cout << "ID: " << (unsigned int)id << " removed.\n";
         }
     }
 }
-
-
 
 /**
  * @brief Removes a wrist motor from the list by its ID.
@@ -371,26 +321,10 @@ void Hand::removeWristMotor(uint8_t id) {
             // Erase the motor from the list and adjust the iterator
             i = wristMotors_.erase(i);
             --i;  // Adjust iterator to prevent skipping elements
-            std::cout << "ID: " << (unsigned int)id << " removed." << std::endl;
+            std::cout << "ID: " << (unsigned int)id << " removed.\n";
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /**
  * @brief Moves a finger motor to a specified position.
@@ -402,18 +336,21 @@ void Hand::removeWristMotor(uint8_t id) {
  * @param position The target position for the FingerMotor. It should be a value between 0 and 4095.
  */
 void Hand::moveFingerMotor(const uint8_t& id, const float& position) {
+    bool motor_found = false;
     // Search for the motor with the specified id
     for (const auto& motor : fingerMotors_) {
         if (motor->getId() == id) {
             // Set the target position for the found motor
             motor->setTargetPosition(position);
+            motor_found = true;
             return;
         }
     }
-    // If the motor with the specified id is not found
-    std::cerr << "Finger Motor with ID " << (unsigned int)(id) << " not found." << std::endl;
+    if (!motor_found)
+    {
+        std::cout << "Finger Motor with ID " << (unsigned int)(id) << " not found.\n";    
+    }
 }
-
 
 /**
  * @brief Moves a wrist motor to a specified position.
@@ -425,25 +362,21 @@ void Hand::moveFingerMotor(const uint8_t& id, const float& position) {
  * @param position The target position for the WristMotor. It should be a value between 0 and 4095.
  */
 void Hand::moveWristMotor(const uint8_t& id, const float& position) {
+    bool motor_found = false;
     // Search for the motor with the specified id
     for (const auto& motor : wristMotors_) {
         if (motor->getId() == id) {
             // Set the target position for the found motor
             motor->setTargetPosition(position);
+            motor_found = true;
             return;
         }
     }
-    // If the motor with the specified id is not found
-    std::cerr << "Wrist Motor with ID " << (unsigned int)(id) << " not found." << std::endl;
+    if (!motor_found)
+    {
+        std::cout << "Wrist Motor with ID " << (unsigned int)(id) << " not found.\n";    
+    }
 }
-
-
-
-
-
-
-
-
 
 /**
  * @brief Reads the current position of a specified finger motor.
@@ -453,17 +386,23 @@ void Hand::moveWristMotor(const uint8_t& id, const float& position) {
  * @param id The ID of the FingerMotor whose position is to be read.
  * @return The current position of the FingerMotor. The position is a value between 0 and 4095.
  */
-float Hand::readFingerPositionMotor(const uint8_t& id) {
-    // Get the ID of the motor from the list of finger motors
-    uint8_t id_motor = fingerMotors_[id]->getId();
-    
-    // Read the current position of the specified motor
-    uint16_t position = fingerMotors_[id]->readPresentPosition();
-    
+uint16_t Hand::readFingerPositionMotor(const uint8_t& id) {
+    uint16_t position = 0;
+    bool motor_found = false;
+    // Search for the motor with the specified id
+    for (const auto& motor : fingerMotors_) {
+        if (motor->getId() == id) {
+            // Read the present position for the found motor
+            position = motor->readPresentPosition();
+            motor_found = true;
+        }
+    }
+    if (!motor_found) {
+        std::cout << "Finger Motor with ID " << (unsigned int)(id) << "not found.\n";
+    }
     // Return the current position
     return position;
 }
-
 
 /**
  * @brief Reads the current position of a specified wrist motor.
@@ -473,23 +412,23 @@ float Hand::readFingerPositionMotor(const uint8_t& id) {
  * @param id The ID of the WristMotor whose position is to be read.
  * @return The current position of the WristMotor. The position is a value between 0 and 4095.
  */
-float Hand::readWristPositionMotor(const uint8_t& id) {
-    // Get the ID of the motor from the list of finger motors
-    uint8_t id_motor = wristMotors_[id]->getId();
-    
-    // Read the current position of the specified motor
-    uint32_t position = wristMotors_[id]->readPresentPosition();
-    
+uint16_t Hand::readWristPositionMotor(const uint8_t& id) {
+    uint16_t position = 0;
+    bool motor_found = false;
+    // Search for the motor with the specified id
+    for (const auto& motor : wristMotors_) {
+        if (motor->getId() == id) {
+            // Read the present position for the found motor
+            position = motor->readPresentPosition();
+            motor_found = true;
+        }
+    }
+    if (!motor_found) {
+        std::cout << "Wrist Motor with ID " << (unsigned int)(id) << "not found.\n";
+    }
     // Return the current position
     return position;
 }
-
-
-
-
-
-
-
 
 /**
  * @brief Moves multiple motors to specified target positions using bulk write.
@@ -507,7 +446,7 @@ void Hand::moveMotors(const std::vector<uint8_t>& ids, const std::vector<float>&
 
     // Check if the sizes of ids and positions vectors match
     if (ids.size() != positions.size()) {
-        std::cerr << "Error: Mismatched IDs and positions sizes." << std::endl;
+        std::cout << "Error: Mismatched IDs and positions sizes.\n";
         return;
     }
     // Prepare parameters for bulk write
@@ -541,27 +480,19 @@ void Hand::moveMotors(const std::vector<uint8_t>& ids, const std::vector<float>&
 
         // If motor ID is not found in both lists, print an error and return
         if (!motor_found) {
-            std::cerr << "Error: Motor ID " << (unsigned int)motor_id << " not found." << std::endl;
+            std::cout << "Error: Motor ID " << (unsigned int)motor_id << " not found.\n";
             return;
         }
     }
 
     // Transmit the bulk write packet
     int result = groupBulkWrite_->txPacket();
-    // std::this_thread::sleep_for(std::chrono::microseconds(500));
     if (result != COMM_SUCCESS) {
-        std::cerr << "Error: Failed to transmit bulk write packet. Result: " << result << std::endl;
+        throw std::runtime_error("Failed to execute bulk write. Result: " + std::to_string(result));
     }
     groupBulkWrite_->clearParam();
     std::this_thread::sleep_for(std::chrono::microseconds(500));
 }
-
-
-
-
-
-
-
 
 /**
  * @brief Reads the positions of multiple motors using bulk read.
@@ -571,7 +502,7 @@ void Hand::moveMotors(const std::vector<uint8_t>& ids, const std::vector<float>&
  * @param ids A vector of motor IDs whose positions are to be read.
  * @return A vector of positions corresponding to each motor ID. The positions are in the range 0 to 4095.
  */
-std::vector<uint32_t> Hand::readMotorsPositions(const std::vector<uint16_t>& ids) {
+std::vector<uint32_t> Hand::readMotorsPositions(const std::vector<uint8_t>& ids) {
     std::vector<uint32_t> positions;
 
     // Check if groupBulkRead_ is initialized, if not, initialize it
@@ -589,7 +520,7 @@ std::vector<uint32_t> Hand::readMotorsPositions(const std::vector<uint16_t>& ids
         for (const auto& motor : fingerMotors_) {
             if (motor->getId() == motor_id) {
                 if (!groupBulkRead_->addParam(motor_id, motor->getAddrPresentPosition(), motor->getLenAddrPresentPosition())) {
-                    std::cerr << "Failed to add FingerMotor ID " << motor_id << " to bulk read." << std::endl;
+                    std::cout << "Failed to add FingerMotor ID " << motor_id << " to bulk read.\n";
                 }
                 motor_found = true;
                 break;
@@ -601,7 +532,7 @@ std::vector<uint32_t> Hand::readMotorsPositions(const std::vector<uint16_t>& ids
             for (const auto& motor : wristMotors_) {
                 if (motor->getId() == motor_id) {
                     if (!groupBulkRead_->addParam(motor_id, motor->getAddrPresentPosition(), motor->getLenAddrPresentPosition())) {
-                        std::cerr << "Failed to add WristMotor ID " << motor_id << " to bulk read." << std::endl;
+                        std::cout << "Failed to add WristMotor ID " << motor_id << " to bulk read.\n";
                     }
                     motor_found = true;
                     break;
@@ -611,15 +542,15 @@ std::vector<uint32_t> Hand::readMotorsPositions(const std::vector<uint16_t>& ids
 
         // If motor ID is not found in both lists, print an error and return
         if (!motor_found) {
-            std::cerr << "Error: Motor ID " << motor_id << " not found." << std::endl;
+            std::cout << "Error: Motor ID " << motor_id << " not found.\n";
             return positions;
         }
     }
 
     // Transmit the bulk read packet
-    if (groupBulkRead_->txRxPacket() != COMM_SUCCESS) {
-        std::cerr << "Failed to execute bulk read." << std::endl;
-        return positions;
+    int result = groupBulkRead_->txRxPacket();
+    if (result != COMM_SUCCESS) {
+        throw std::runtime_error("Failed to execute bulk read. Result: " + std::to_string(result));
     }
 
     // Retrieve the positions from the bulk read packet
@@ -634,7 +565,7 @@ std::vector<uint32_t> Hand::readMotorsPositions(const std::vector<uint16_t>& ids
                     int32_t position_data = groupBulkRead_->getData(motor_id, motor->getAddrPresentPosition(), motor->getLenAddrPresentPosition());
                     positions.push_back(static_cast<uint32_t>(position_data));
                 } else {
-                    std::cerr << "Data not available for FingerMotor ID " << motor_id << "." << std::endl;
+                    std::cout << "Data not available for FingerMotor ID " << motor_id << ".\n";
                 }
                 motor_found = true;
                 break;
@@ -649,7 +580,7 @@ std::vector<uint32_t> Hand::readMotorsPositions(const std::vector<uint16_t>& ids
                         int32_t position_data = groupBulkRead_->getData(motor_id, motor->getAddrPresentPosition(), motor->getLenAddrPresentPosition());
                         positions.push_back(static_cast<uint32_t>(position_data));
                     } else {
-                        std::cerr << "Data not available for WristMotor ID " << motor_id << "." << std::endl;
+                        std::cout << "Data not available for WristMotor ID " << motor_id << ".\n";
                     }
                     motor_found = true;
                     break;
@@ -659,7 +590,7 @@ std::vector<uint32_t> Hand::readMotorsPositions(const std::vector<uint16_t>& ids
 
         // If motor ID is not found during data retrieval, print an error
         if (!motor_found) {
-            std::cerr << "Error: Motor ID " << motor_id << " not found during data retrieval." << std::endl;
+            std::cout << "Error: Motor ID " << motor_id << " not found during data retrieval.\n";
         }
     }
 

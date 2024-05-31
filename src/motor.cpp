@@ -75,7 +75,7 @@ void Motor::setId(uint8_t id) {
  * 
  * @return The identifier of the motor.
  */
-int Motor::getId() {
+uint8_t Motor::getId() {
     return id_;
 }
 

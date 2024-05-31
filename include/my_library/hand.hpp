@@ -260,7 +260,7 @@ public:
      * @param id The identifier of the motor.
      * @return The position of the motor.
      */
-    float readFingerPositionMotor(const uint8_t& id);
+    uint16_t readFingerPositionMotor(const uint8_t& id);
 
     /**
      * @brief Reads the position of a wrist motor.
@@ -268,7 +268,7 @@ public:
      * @param id The identifier of the motor.
      * @return The position of the motor.
      */
-    float readWristPositionMotor(const uint8_t& id);
+    uint16_t readWristPositionMotor(const uint8_t& id);
 
     /**
      * @brief Moves multiple motors using bulk write.
@@ -284,7 +284,7 @@ public:
      * @param ids A vector of motor identifiers.
      * @return A vector of positions corresponding to the motor identifiers.
      */
-    std::vector<uint32_t> readMotorsPositions(const std::vector<uint16_t>& ids);
+    std::vector<uint32_t> readMotorsPositions(const std::vector<uint8_t>& ids);
 };
 
 #endif // HAND_H

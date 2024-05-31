@@ -74,7 +74,7 @@ public:
      * 
      * @return Identifier of the motor.
      */
-    int getId();
+    uint8_t getId();
 
     /**
      * @brief Sets the address for the target position.
