@@ -136,38 +136,6 @@ public:
     void setSerialPortLowLatency(const std::string& serial_port);
 
     /**
-     * @brief Converts radians to degrees.
-     * 
-     * @param radians The angle in radians.
-     * @return The angle in degrees.
-     */
-    float rad_to_degrees(float radians);
-
-    /**
-     * @brief Converts degrees to position.
-     * 
-     * @param degrees The angle in degrees.
-     * @return The position corresponding to the angle.
-     */
-    uint16_t degrees_to_position(float degrees);
-
-    /**
-     * @brief Converts degrees to radians.
-     * 
-     * @param degrees The angle in degrees.
-     * @return The angle in radians.
-     */
-    float degrees_to_rad(float degrees);
-
-    /**
-     * @brief Converts position to degrees.
-     * 
-     * @param position The position.
-     * @return The angle in degrees corresponding to the position.
-     */
-    float position_to_degrees(uint16_t position);
-
-    /**
      * @brief Creates a finger motor.
      * 
      * @param id The identifier of the motor.
@@ -260,7 +228,7 @@ public:
      * @param id The identifier of the motor.
      * @return The position of the motor.
      */
-    uint16_t readFingerPositionMotor(const uint8_t& id);
+    uint16_t readFingerMotorPosition(const uint8_t& id);
 
     /**
      * @brief Reads the position of a wrist motor.
@@ -268,7 +236,7 @@ public:
      * @param id The identifier of the motor.
      * @return The position of the motor.
      */
-    uint16_t readWristPositionMotor(const uint8_t& id);
+    uint16_t readWristMotorPosition(const uint8_t& id);
 
     /**
      * @brief Moves multiple motors using bulk write.
