@@ -386,7 +386,7 @@ void Hand::moveWristMotor(const uint8_t& id, const float& position) {
  * @param id The ID of the FingerMotor whose position is to be read.
  * @return The current position of the FingerMotor. The position is a value between 0 and 4095.
  */
-uint16_t Hand::readFingerPositionMotor(const uint8_t& id) {
+uint16_t Hand::readFingerMotorPosition(const uint8_t& id) {
     uint16_t position = 0;
     bool motor_found = false;
     // Search for the motor with the specified id
@@ -412,7 +412,7 @@ uint16_t Hand::readFingerPositionMotor(const uint8_t& id) {
  * @param id The ID of the WristMotor whose position is to be read.
  * @return The current position of the WristMotor. The position is a value between 0 and 4095.
  */
-uint16_t Hand::readWristPositionMotor(const uint8_t& id) {
+uint16_t Hand::readWristMotorPosition(const uint8_t& id) {
     uint16_t position = 0;
     bool motor_found = false;
     // Search for the motor with the specified id
