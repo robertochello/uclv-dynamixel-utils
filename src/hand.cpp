@@ -398,7 +398,7 @@ uint16_t Hand::readFingerMotorPosition(const uint8_t& id) {
         }
     }
     if (!motor_found) {
-        std::cout << "Finger Motor with ID " << (unsigned int)(id) << "not found.\n";
+        std::cout << "Finger Motor with ID " << (unsigned int)(id) << " not found.\n";
     }
     // Return the current position
     return position;
