@@ -1,5 +1,5 @@
 #include <iostream>
-#include "my_library/motor.hpp"
+#include "uclv_dynamixel_utils/motor.hpp"
 
 /**
  * @brief Constructor of the Motor class.

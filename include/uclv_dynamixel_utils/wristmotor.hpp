@@ -6,7 +6,7 @@
 /**
  * @brief The WristMotor class represents a wrist motor, which is a specific type of motor.
  */
-class WristMotor : public Motor {
+class WristMotor : public uclv::dynamixel_utils::Motor {
 private:
 public:
 

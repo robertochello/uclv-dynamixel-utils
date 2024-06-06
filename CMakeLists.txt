@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(my_library)
+project(uclv_dynamixel_utils)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -25,22 +25,22 @@ endif()
 
 include_directories(include)
 
-add_library(my_library
+add_library(uclv_dynamixel_utils
   src/hand.cpp
   src/motor.cpp
   src/fingermotor.cpp
   src/wristmotor.cpp
 )
 
-ament_target_dependencies(my_library
+ament_target_dependencies(uclv_dynamixel_utils
     "dynamixel_sdk"
 )
-ament_export_targets(my_libraryTargets HAS_LIBRARY_TARGET)
+ament_export_targets(uclv_dynamixel_utilsTargets HAS_LIBRARY_TARGET)
 ament_export_dependencies(dynamixel_sdk)
 
 install(
-  TARGETS my_library
-  EXPORT my_libraryTargets
+  TARGETS uclv_dynamixel_utils
+  EXPORT uclv_dynamixel_utilsTargets
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
   RUNTIME DESTINATION bin

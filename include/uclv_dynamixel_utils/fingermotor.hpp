@@ -6,7 +6,7 @@
 /**
  * @brief The FingerMotor class represents a finger motor, which is a specific type of motor.
  */
-class FingerMotor : public Motor {
+class FingerMotor : public uclv::dynamixel_utils::Motor {
 private:
 public:
 

@@ -1,5 +1,8 @@
 #include "dynamixel_sdk/dynamixel_sdk.h"
-#include "my_library/fingermotor.hpp"
+#include "uclv_dynamixel_utils/fingermotor.hpp"
+
+using namespace uclv::dynamixel_utils;
+
 
 /**
  * @brief Constructor of the FingerMotor class.
