@@ -1,5 +1,5 @@
 #include "dynamixel_sdk/dynamixel_sdk.h"
-#include "my_library/wristmotor.hpp"
+#include "uclv_dynamixel_utils/wristmotor.hpp"
 
 /**
  * @brief Constructor of the WristMotor class.
