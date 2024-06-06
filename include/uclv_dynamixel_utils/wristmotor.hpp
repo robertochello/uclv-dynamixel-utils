@@ -3,10 +3,12 @@
 
 #include "motor.hpp"
 
+using namespace uclv::dynamixel_utils;
+
 /**
  * @brief The WristMotor class represents a wrist motor, which is a specific type of motor.
  */
-class WristMotor : public uclv::dynamixel_utils::Motor {
+class WristMotor : public Motor {
 private:
 public:
 

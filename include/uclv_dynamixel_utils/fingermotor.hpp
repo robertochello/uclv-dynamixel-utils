@@ -3,10 +3,12 @@
 
 #include "motor.hpp"
 
+using namespace uclv::dynamixel_utils;
+
 /**
  * @brief The FingerMotor class represents a finger motor, which is a specific type of motor.
  */
-class FingerMotor : public uclv::dynamixel_utils::Motor {
+class FingerMotor : public Motor {
 private:
 public:
 
