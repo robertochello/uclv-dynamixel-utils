@@ -1,6 +1,8 @@
 #include <iostream>
 #include "uclv_dynamixel_utils/motor.hpp"
 
+using namespace uclv::dynamixel_utils;
+
 /**
  * @brief Constructor of the Motor class.
  * 
