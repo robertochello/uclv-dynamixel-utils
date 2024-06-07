@@ -3,6 +3,10 @@
 
 using namespace uclv::dynamixel_utils;
 
+/**
+ * @class FingerMotor
+ * @brief A class representing a finger motor, inheriting from the Motor class.
+ */
 
 /**
  * @brief Constructor of the FingerMotor class.
