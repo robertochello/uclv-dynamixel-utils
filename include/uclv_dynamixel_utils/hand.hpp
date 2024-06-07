@@ -7,9 +7,7 @@
 #include <cmath>
 
 #include "dynamixel_sdk/dynamixel_sdk.h"
-
 #include "colors.hpp"
-
 #include "motor.hpp"
 #include "fingermotor.hpp"
 #include "wristmotor.hpp"
@@ -18,6 +16,7 @@ namespace uclv::dynamixel_utils
 {
 
     /**
+     * @class Hand
      * @brief The Hand class represents a robotic hand with multiple motors.
      */
     class Hand
