@@ -8,6 +8,7 @@ namespace uclv::dynamixel_utils
 {
 
     /**
+     * @class Motor
      * @brief The Motor class represents a single motor connected to the system.
      */
     class Motor
@@ -60,8 +61,6 @@ namespace uclv::dynamixel_utils
          */
         Motor();
 
-        // DISTRUTTORE?
-
         /**
          * @brief Sets the identifier of the motor.
          *
@@ -105,35 +104,45 @@ namespace uclv::dynamixel_utils
         uint16_t getAddrPresentPosition() const;
 
         /**
-         * @brief Sets the size (nr of bytes to write) for address of the target position.
+         * @brief Sets the size (number of bytes to write) for address of the target position.
          *
          * @param lenAddrTargetPosition The size to be set for length of address for target position.
          */
         void setLenAddrTargetPosition(uint16_t lenAddrTargetPosition);
 
         /**
-         * @brief Gets the size (nr of bytes to write) for address of the target position.
+         * @brief Gets the size (number of bytes to write) for address of the target position.
          *
-         * @return  The size to be set for length of address for target position.
+         * @return The size to be set for length of address for target position.
          */
         uint16_t getLenAddrTargetPosition() const;
 
         /**
-         * @brief Sets the size (nr of bytes to write) for address of the present position.
+         * @brief Sets the size (number of bytes to write) for address of the present position.
          *
          * @param lenAddrPresentPosition The size to be set for length of address for present position.
          */
         void setLenAddrPresentPosition(uint16_t lenAddrPresentPosition);
 
         /**
-         * @brief Gets the size (nr of bytes to write) for address of the present position.
+         * @brief Gets the size (number of bytes to write) for address of the present position.
          *
-         * @return  The size to be set for length of address for present position.
+         * @return The size to be set for length of address for present position.
          */
         uint16_t getLenAddrPresentPosition() const;
 
+        /**
+         * @brief Sets the address for torque enable.
+         *
+         * @param addrTorqueEnable The address to be set for torque enable.
+         */
         void setAddrTorqueEnable(uint16_t addrTorqueEnable);
 
+        /**
+         * @brief Gets the address for torque enable.
+         *
+         * @return The address for torque enable.
+         */
         uint16_t getAddrTorqueEnable() const;
 
         /**
