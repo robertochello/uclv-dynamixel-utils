@@ -2,6 +2,8 @@
 
 This repository contains a C++ library for controlling Dynamixel motors using the Dynamixel 2.0 protocol.
 
+See the [C++ documentations](https://robertochello.github.io/uclv-dynamixel-utils)
+
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
