@@ -241,13 +241,13 @@ const std::vector<std::shared_ptr<FingerMotor>> &Hand::addFingerMotor(uint8_t id
         if (motor->getId() == id)
         {
             // If a motor with the specified ID is found, print a message and return the current list
-            std::cout << "FingerMotor with ID " << (unsigned int)id << " already exists in the list.\n";
+            std::cout << "FingerMotor with ID " << (unsigned int)id << " already "<< WARN_COLOR << "exists" << CRESET <<" in the list.\n";
             return fingerMotors_;
         }
     }
     // If no motor with the specified ID is found, create a new FingerMotor and add it to the list
     fingerMotors_.push_back(createFingerMotor(id));
-    std::cout << "FingerMotor with ID " << (unsigned int)id << " created.\n";
+    std::cout << "FingerMotor with ID " << (unsigned int)id << SUCCESS_COLOR <<" created" << CRESET ".\n";
     return fingerMotors_;
 }
 
@@ -268,13 +268,13 @@ const std::vector<std::shared_ptr<WristMotor>> &Hand::addWristMotor(uint8_t id)
         if (motor->getId() == id)
         {
             // If a motor with the specified ID is found, print a message and return the current list
-            std::cout << "WristMotor with ID " << (unsigned int)id << " already exists in the list.\n";
+            std::cout << "WristMotor with ID " << (unsigned int)id << " already "<< WARN_COLOR << "exists" << CRESET <<" in the list.\n";
             return wristMotors_;
         }
     }
     // If no motor with the specified ID is found, create a new FingerMotor and add it to the list
     wristMotors_.push_back(createWristMotor(id));
-    std::cout << "WristMotor with ID " << (unsigned int)id << " created.\n";
+    std::cout << "WristMotor with ID " << (unsigned int)id << SUCCESS_COLOR <<" created" << CRESET ".\n";
     return wristMotors_;
 }
 
